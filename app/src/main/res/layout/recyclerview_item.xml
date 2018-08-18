@@ -27,6 +27,7 @@
         android:layout_gravity="center"
         android:contentDescription="@string/rv_item_piece"
         android:padding="10dp"
+        android:visibility="invisible"
         app:srcCompat="@drawable/circle" />
 
 
