@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DamaSimultanea</string>
+
+    <string name="rv_item_box_descr">DelimiterBox</string>
+    <string name="rv_item_piece">Piece</string>
+
+</resources>
