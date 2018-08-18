@@ -2,7 +2,10 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,17 +16,8 @@ import java.util.Arrays;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    private int[] enabledPositions = {
-            0,2,4,6,
-            9,11,13,15,
-            16,18,20,22,
-            25,27,29,31,
-            32,34,36,38,
-            41,43,45,47,
-            48,50,52,54,
-            57,59,61,63};
+    private PiecesPositions pieces = new PiecesPositions();
 
-    int numberOfElements = 64;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
@@ -42,38 +36,39 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     // binds the data to the textview in each cell
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (isPlayablePosition(position)) {
+        if (pieces.isPlayablePosition(position)) {
             holder.myTextView.setBackgroundColor(Color.BLACK);
             holder.pieceImage.setVisibility(View.VISIBLE);
         } else {
             holder.myTextView.setBackgroundColor(Color.WHITE);
             holder.pieceImage.setVisibility(View.INVISIBLE);
         }
+
+        switch (pieces.whichPiece(position)){
+            case 0:
+                holder.pieceImage.setVisibility(View.INVISIBLE);
+                break;
+
+            case 1:
+                holder.pieceImage.setVisibility(View.VISIBLE);
+                holder.pieceImage.setColorFilter( Color.BLUE, PorterDuff.Mode.MULTIPLY );
+                break;
+
+            case 2:
+                holder.pieceImage.setVisibility(View.VISIBLE);
+                holder.pieceImage.setColorFilter( Color.GREEN, PorterDuff.Mode.MULTIPLY );
+                break;
+
+                default:
+                    holder.pieceImage.setVisibility(View.INVISIBLE);//fredmudar throw exception
+        }
+
     }
 
     // total number of cells
     @Override
     public int getItemCount() {
-        return numberOfElements;
-    }
-
-
-    // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView myTextView;
-        ImageView pieceImage;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            myTextView = (TextView) itemView.findViewById(R.id.rv_item_text);
-            pieceImage = (ImageView) itemView.findViewById(R.id.rv_item_circle);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-        }
+        return pieces.getTableSize();
     }
 
     // convenience method for getting data at click position
@@ -91,12 +86,29 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         void onItemClick(View view, int position);
     }
 
-    boolean isPlayablePosition(int position){
-        for (int enabled : enabledPositions){
-            if(position == enabled)
-                return true;
+
+
+
+
+
+    // stores and recycles views as they are scrolled off screen
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView myTextView;
+        ImageView pieceImage;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            myTextView = (TextView) itemView.findViewById(R.id.rv_item_text);
+            pieceImage = (ImageView) itemView.findViewById(R.id.rv_item_circle);
+            itemView.setOnClickListener(this);
         }
-        return false;
+
+        @Override
+        public void onClick(View view) {
+            if (mClickListener != null)
+                mClickListener.onItemClick(view, getAdapterPosition());
+        }
     }
+
 
 }
