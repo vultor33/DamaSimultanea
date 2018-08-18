@@ -26,7 +26,8 @@ public class MainActivity
 
     @Override
     public void onItemClick(View view, int position) {
-        Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
+        //Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
+        adapter.changeBackgroundColor(position);
     }
 
     void setTheRecyclerViewer(){

@@ -60,7 +60,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 break;
 
                 default:
-                    holder.pieceImage.setVisibility(View.INVISIBLE);//fredmudar throw exception
+                    holder.pieceImage.setVisibility(View.INVISIBLE);//fredmudar esses dois swirchs tambem nao tem muita condicao throw exception
         }
 
     }
@@ -81,10 +81,15 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         this.mClickListener = itemClickListener;
     }
 
+    public void changeBackgroundColor(int position){ //fredmudar adicionar o viewholder aqui e mudar a cor do background.
+    }
+
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
+
+
 
 
 
