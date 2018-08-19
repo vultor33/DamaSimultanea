@@ -27,6 +27,18 @@ public class PiecesPositions {
         return PieceTypeEnum.NOTPLAYABLE;
     }
 
+    public void movePiece(int piecePosition, int newPiecePosition){
+        PieceTypeEnum pieceType = whichPiece(piecePosition);
+        for(int i=0; i<ROW_SIZE; i++){
+            for(int j=0; j<COLUMN_SIZE; j++){
+                if(piecePosition == playablePositionsTable[i][j])
+                    pieceTypeTable[i][j] = PieceTypeEnum.BLANK;
+                if(newPiecePosition == playablePositionsTable[i][j])
+                    pieceTypeTable[i][j] = pieceType;
+            }
+        }
+    }
+
     public ArrayList<Integer> possibleMovements(int position){
         ArrayList<Integer> movements = new ArrayList<>();
 

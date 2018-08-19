@@ -53,8 +53,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         this.mClickListener = itemClickListener;
     }
 
-    public void changeBackgroundColor(int position){ //fredmudar adicionar o viewholder aqui e mudar a cor do background.
-        boardDrawings.highlightBackground(position);
+    public void playPiece(int position){ //fredmudar adicionar o viewholder aqui e mudar a cor do background.
+        boardDrawings.playPiece(position);
     }
 
     // parent activity will implement this method to respond to click events
