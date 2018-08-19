@@ -16,15 +16,13 @@ import java.util.Arrays;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    private PiecesPositions pieces = new PiecesPositions();
     private BoardDrawings boardDrawings;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     MyRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
-        boardDrawings = new BoardDrawings(pieces, context);
-
+        boardDrawings = new BoardDrawings(context);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     @Override
     public int getItemCount() {
-        return pieces.getTableSize(); //cell count
+        return boardDrawings.getTableSize(); //cell count
     }
 
     // convenience method for getting data at click position
@@ -53,7 +51,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         this.mClickListener = itemClickListener;
     }
 
-    public void playPiece(int position){ //fredmudar adicionar o viewholder aqui e mudar a cor do background.
+    public void playPiece(int position){
         boardDrawings.playPiece(position);
     }
 

@@ -2,7 +2,6 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +11,11 @@ import java.util.List;
 
 public class BoardDrawings {
 
-    private PiecesPositions piecesPositions;
+    private PiecesPositions piecesPositions = new PiecesPositions();
     private List<MyRecyclerViewAdapter.ViewHolder> allHolders = new ArrayList<>();
     ArrayList<Integer> possibleMovements = new ArrayList<>();
     private int selectedPiece;
+    private int NOT_SELECTED = -1;
 
     //Colors
     private int pieceSideAColor;
@@ -25,14 +25,17 @@ public class BoardDrawings {
     private int backGroundNotPlayableColor;
 
 
-    BoardDrawings(PiecesPositions pieces, @NotNull Context context){
-        piecesPositions = pieces;
+    BoardDrawings(@NotNull Context context){
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
         highlightColor = ContextCompat.getColor(context, R.color.highLight);
         backGroundPlayableColor = ContextCompat.getColor(context, R.color.colorPrimaryDark);
         backGroundNotPlayableColor = ContextCompat.getColor(context, R.color.colorAccent);
-        selectedPiece = -1;
+        selectedPiece = NOT_SELECTED;
+    }
+
+    public int getTableSize(){
+        return piecesPositions.getTableSize();
     }
 
     public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){
@@ -57,19 +60,19 @@ public class BoardDrawings {
 
     private void highlightMovements(int position){
         PieceTypeEnum piece = piecesPositions.whichPiece(position);
-        if(piece == PieceTypeEnum.BLANK)
-            return;
-        else if(position == selectedPiece){ //turn off
+        if(position == selectedPiece)
             clearHighlight();
-        }
-        else if(selectedPiece != -1)
-            return;
-        else if(piece != PieceTypeEnum.NOTPLAYABLE){
-            highlightSelectedColor(position);
-        }
+        else if(isValidSelection(piece))
+            highlightSelectedPiece(position);
     }
 
-    private void highlightSelectedColor(int position){
+    private boolean isValidSelection(PieceTypeEnum piece){
+        boolean isPiece = (piece != PieceTypeEnum.NOTPLAYABLE) && (piece != PieceTypeEnum.BLANK);
+        boolean isAvailable = selectedPiece == NOT_SELECTED;
+        return isPiece && isAvailable;
+    }
+
+    private void highlightSelectedPiece(int position){
         possibleMovements = piecesPositions.possibleMovements(position);
         if(possibleMovements.size() == 0)
             return;
@@ -82,7 +85,7 @@ public class BoardDrawings {
 
     private void clearHighlight(){
         allHolders.get(selectedPiece).myTextView.setBackgroundColor(backGroundPlayableColor);
-        selectedPiece = -1;
+        selectedPiece = NOT_SELECTED;
         for (Integer iMoves : possibleMovements) {
             allHolders.get(iMoves).myTextView.setBackgroundColor(backGroundPlayableColor);
         }
