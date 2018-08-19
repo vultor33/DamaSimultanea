@@ -1,12 +1,14 @@
 package com.example.android.damasimultanea;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 // android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
 public class MainActivity
@@ -26,7 +28,7 @@ public class MainActivity
 
     @Override
     public void onItemClick(View view, int position) {
-        //Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
+        Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
         adapter.changeBackgroundColor(position);
     }
 
