@@ -1,98 +1,105 @@
 package com.example.android.damasimultanea;
 
 
+import android.util.Log;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class PiecesPositions {
-    private int tableSize = 64;
-
-
-
-    private int[] redPieces = {
-            0,2,4,6,
-            9,11,13,15,
-            16,18,20,22};
-
-    private int[] bluePieces = {
-            41,43,45,47,
-            48,50,52,54,
-            57,59,61,63};
+    final private int TABLE_SIZE = 64;
+    final int ROW_SIZE = 8;
+    final int COLUMN_SIZE = 4;
+    private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
+    private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
 
     public int getTableSize(){
-        return tableSize;
-    }
-
-    public boolean isPlayablePosition(int position){
-        for(int i=0; i<8; i++){
-            for(int j=0; j<4; j++){
-                if(position == playablePositionsTable[i][j])
-                    return true;
-            }
-        }
-        return false;
-
-/*
-        for (int enabled : enabledPositions){
-            if(position == enabled)
-                return true;
-        }
-        return false;
-        */
+        return TABLE_SIZE;
     }
 
     public PieceTypeEnum whichPiece(int position){
-        for(int i=0; i<8; i++){
-            for(int j=0; j<4; j++){
+        for(int i=0; i<ROW_SIZE; i++){
+            for(int j=0; j<COLUMN_SIZE; j++){
                 if(position == playablePositionsTable[i][j])
                     return pieceTypeTable[i][j];
             }
         }
-        return PieceTypeEnum.BLANK;
-        /*throw exception
-        for (int enabled : redPieces){
-            if(position == enabled)
-                return 1;
-        }
-        for (int enabled : bluePieces){
-            if(position == enabled)
-                return 2;
-        }
-        return 0;
-        */
+        return PieceTypeEnum.NOTPLAYABLE;
     }
 
+    public ArrayList<Integer> possibleMovements(int position){
+        ArrayList<Integer> movements = new ArrayList<>();
 
+        for(int i=0; i<ROW_SIZE; i++){
+            for(int j=0; j<COLUMN_SIZE; j++){
+                if(position == playablePositionsTable[i][j]) {
+                    if(pieceTypeTable[i][j] == PieceTypeEnum.pieceA){
+                        movementsForPieceX(movements,i,j);
+                        return movements;
+                    }
+                    else if(pieceTypeTable[i][j] == PieceTypeEnum.pieceB){
+                        movementsForPieceX(movements,i,j);
+                        return movements;
+                    }
+                }
+            }
+        }
+        return movements;
+    }
 
+    private void movementsForPieceX(ArrayList<Integer> movements, int row, int column1) {
+        int nextRow = nextPossibleRow(pieceTypeTable[row][column1], row);
+        int INVALID_ROW = -1;
+        if(nextRow != INVALID_ROW){
+            addMovement(movements, nextRow, column1);
+            int column2 = column1 + nextPossibleColumn(row);
+            addMovement(movements, nextRow, column2);
+        }
+    }
 
+    private void addMovement(ArrayList<Integer> movements, int row, int column){
+        if(isColumnValid(column)){
+            if(isTypeBlank(pieceTypeTable[row][column])){
+                movements.add(playablePositionsTable[row][column]);
+            }
+        }
+    }
 
+    private boolean isRowValid(int index){
+        return (index > -1) && (index < ROW_SIZE);
+    }
 
+    private boolean isColumnValid(int index){
+        return (index > -1) && (index < COLUMN_SIZE);
+    }
 
+    private int nextPossibleColumn(int row){
+        if(row % 2 == 0)
+            return -1;
+        else
+            return +1;
+    }
 
+    private int nextPossibleRow(PieceTypeEnum pieceType, int row){
+        if(pieceType == PieceTypeEnum.pieceA) {
+            if(isRowValid(row + 1))
+                return row + 1;
+            else
+                return -1;
+        }
+        else if(pieceType == PieceTypeEnum.pieceB) {
+            if (isRowValid(row - 1))
+                return row - 1;
+            else
+                return -1;
+        }
+        else
+            return -1;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    private int[] enabledPositions = {
-            0,2,4,6,
-            9,11,13,15,
-            16,18,20,22,
-            25,27,29,31,
-            32,34,36,38,
-            41,43,45,47,
-            48,50,52,54,
-            57,59,61,63};
-
-
-
-    private int[][] playablePositionsTable = new int[8][4];
-    private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[8][4];
+    private boolean isTypeBlank(PieceTypeEnum pieceType){
+        return pieceType == PieceTypeEnum.BLANK;
+    }
 
     PiecesPositions(){
 
@@ -136,20 +143,20 @@ public class PiecesPositions {
         playablePositionsTable[7][2] = 61;
         playablePositionsTable[7][3] = 63;
 
-        pieceTypeTable[0][0] = PieceTypeEnum.A;
-        pieceTypeTable[0][1] = PieceTypeEnum.A;
-        pieceTypeTable[0][2] = PieceTypeEnum.A;
-        pieceTypeTable[0][3] = PieceTypeEnum.A;
+        pieceTypeTable[0][0] = PieceTypeEnum.pieceA;
+        pieceTypeTable[0][1] = PieceTypeEnum.pieceA;
+        pieceTypeTable[0][2] = PieceTypeEnum.pieceA;
+        pieceTypeTable[0][3] = PieceTypeEnum.pieceA;
 
-        pieceTypeTable[1][0] = PieceTypeEnum.A;
-        pieceTypeTable[1][1] = PieceTypeEnum.A;
-        pieceTypeTable[1][2] = PieceTypeEnum.A;
-        pieceTypeTable[1][3] = PieceTypeEnum.A;
+        pieceTypeTable[1][0] = PieceTypeEnum.pieceA;
+        pieceTypeTable[1][1] = PieceTypeEnum.pieceA;
+        pieceTypeTable[1][2] = PieceTypeEnum.pieceA;
+        pieceTypeTable[1][3] = PieceTypeEnum.pieceA;
 
-        pieceTypeTable[2][0] = PieceTypeEnum.A;
-        pieceTypeTable[2][1] = PieceTypeEnum.A;
-        pieceTypeTable[2][2] = PieceTypeEnum.A;
-        pieceTypeTable[2][3] = PieceTypeEnum.A;
+        pieceTypeTable[2][0] = PieceTypeEnum.pieceA;
+        pieceTypeTable[2][1] = PieceTypeEnum.pieceA;
+        pieceTypeTable[2][2] = PieceTypeEnum.pieceA;
+        pieceTypeTable[2][3] = PieceTypeEnum.pieceA;
 
         pieceTypeTable[3][0] = PieceTypeEnum.BLANK;
         pieceTypeTable[3][1] = PieceTypeEnum.BLANK;
@@ -161,20 +168,20 @@ public class PiecesPositions {
         pieceTypeTable[4][2] = PieceTypeEnum.BLANK;
         pieceTypeTable[4][3] = PieceTypeEnum.BLANK;
 
-        pieceTypeTable[5][0] = PieceTypeEnum.B;
-        pieceTypeTable[5][1] = PieceTypeEnum.B;
-        pieceTypeTable[5][2] = PieceTypeEnum.B;
-        pieceTypeTable[5][3] = PieceTypeEnum.B;
+        pieceTypeTable[5][0] = PieceTypeEnum.pieceB;
+        pieceTypeTable[5][1] = PieceTypeEnum.pieceB;
+        pieceTypeTable[5][2] = PieceTypeEnum.pieceB;
+        pieceTypeTable[5][3] = PieceTypeEnum.pieceB;
 
-        pieceTypeTable[6][0] = PieceTypeEnum.B;
-        pieceTypeTable[6][1] = PieceTypeEnum.B;
-        pieceTypeTable[6][2] = PieceTypeEnum.B;
-        pieceTypeTable[6][3] = PieceTypeEnum.B;
+        pieceTypeTable[6][0] = PieceTypeEnum.pieceB;
+        pieceTypeTable[6][1] = PieceTypeEnum.pieceB;
+        pieceTypeTable[6][2] = PieceTypeEnum.pieceB;
+        pieceTypeTable[6][3] = PieceTypeEnum.pieceB;
 
-        pieceTypeTable[7][0] = PieceTypeEnum.B;
-        pieceTypeTable[7][1] = PieceTypeEnum.B;
-        pieceTypeTable[7][2] = PieceTypeEnum.B;
-        pieceTypeTable[7][3] = PieceTypeEnum.B;
+        pieceTypeTable[7][0] = PieceTypeEnum.pieceB;
+        pieceTypeTable[7][1] = PieceTypeEnum.pieceB;
+        pieceTypeTable[7][2] = PieceTypeEnum.pieceB;
+        pieceTypeTable[7][3] = PieceTypeEnum.pieceB;
 
     }
 }

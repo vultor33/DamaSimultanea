@@ -1,7 +1,7 @@
 package com.example.android.damasimultanea;
 
 public enum PieceTypeEnum {
-    BLANK(0), A(1), B(2);
+    BLANK(0), pieceA(1), pieceB(2), NOTPLAYABLE(3);
 
     private final int valor;
     PieceTypeEnum(int valorOpcao){
