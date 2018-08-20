@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 public class MovementCalculations {
+    private int INVALID_NUMBER = -1;
     private int ROW_SIZE;
     private int COLUMN_SIZE;
     private int[][] playablePositionsTable;
@@ -16,8 +17,10 @@ public class MovementCalculations {
 
     private class PositionData{
         ArrayList<Integer> moves = new ArrayList<>();
-        int rowOfSelected = -1;
-        int columnOfSelected = -1;
+        int rowOfSelected = INVALID_NUMBER;
+        int columnOfSelected = INVALID_NUMBER;
+        int position = INVALID_NUMBER;
+        PieceTypeEnum piece = PieceTypeEnum.NOTPLAYABLE;
     }
 
     MovementCalculations(int[][] playablePositionsTable_in,  PieceTypeEnum[][] pieceTypeTable_in){
@@ -27,23 +30,34 @@ public class MovementCalculations {
         COLUMN_SIZE = playablePositionsTable[0].length;
     }
 
+    public PieceTypeEnum whichPiece(int position){
+        for(int i=0; i<ROW_SIZE; i++){
+            for(int j=0; j<COLUMN_SIZE; j++){
+                if(position == playablePositionsTable[i][j])
+                    return pieceTypeTable[i][j];
+            }
+        }
+        return PieceTypeEnum.NOTPLAYABLE;
+    }
+
     public void piecesAdjacencies(int position) {
-        Log.d("fredmudar", "comecou adjacencies");
         reversedMovement = false;
         rawPossibleMovements = true;
-        columnBlock = -1;
-        PositionData avaibleMoves = allPossibleMovements(position);
+        columnBlock = INVALID_NUMBER;
+        PositionData selectedPiece = allPossibleMovements(position);
 
-        Log.d("fredmudar", "passou do all");
         reversedMovement = true;
         rawPossibleMovements = false;
-        columnBlock = avaibleMoves.columnOfSelected;
-        ArrayList<Integer> possibleCaptures = new ArrayList<>();
-        for (Integer iMoves : avaibleMoves.moves) {
-            ArrayList<Integer> tempPossibleCaptures = allPossibleMovements(iMoves).moves;
-            possibleCaptures.addAll(tempPossibleCaptures);
+        columnBlock = selectedPiece.columnOfSelected;
+        ArrayList<Integer> possibleCapturesPieces = new ArrayList<>();
+        for (Integer selectedMoves : selectedPiece.moves) {
+            PositionData adjacentPiece = allPossibleMovements(selectedMoves);
+            if(adjacentPiece.piece == selectedPiece.piece)
+                continue;
+            if((adjacentPiece.position != INVALID_NUMBER) && (adjacentPiece.moves.size() > 0))
+                possibleCapturesPieces.add(adjacentPiece.position);
         }
-        for (Integer iMoves : possibleCaptures) {
+        for (Integer iMoves : possibleCapturesPieces) {
             Log.d("fredmudar", "captures:  " + String.valueOf(iMoves));
         }
     }
@@ -51,7 +65,7 @@ public class MovementCalculations {
     public ArrayList<Integer> possibleMovements(int position) {
         reversedMovement = false;
         rawPossibleMovements = false;
-        columnBlock = -1;
+        columnBlock = INVALID_NUMBER;
         return allPossibleMovements(position).moves;
     }
 
@@ -63,6 +77,8 @@ public class MovementCalculations {
                     if((pieceTypeTable[row][column] == PieceTypeEnum.pieceA) ||(pieceTypeTable[row][column] == PieceTypeEnum.pieceB)){
                         positionData.rowOfSelected = row;
                         positionData.columnOfSelected = column;
+                        positionData.position = position;
+                        positionData.piece = pieceTypeTable[row][column];
                         movementsForPieceX(positionData.moves, row, column);
                         return positionData;
                     }
@@ -75,12 +91,11 @@ public class MovementCalculations {
     private void movementsForPieceX(ArrayList<Integer> movements, int row, int column1) {
         int nextRow;
         if(reversedMovement)
-             nextRow = reversedNextPossibleRow(pieceTypeTable[row][column1], row);
+            nextRow = reversedNextPossibleRow(pieceTypeTable[row][column1], row);
         else
             nextRow = nextPossibleRow(pieceTypeTable[row][column1], row);
 
-        int INVALID_ROW = -1;
-        if(nextRow != INVALID_ROW){
+        if(nextRow != INVALID_NUMBER){
             addMovement(movements, nextRow, column1);
             int column2 = column1 + nextPossibleColumn(row);
             addMovement(movements, nextRow, column2);
@@ -118,7 +133,7 @@ public class MovementCalculations {
         else if(pieceType == PieceTypeEnum.pieceB)
             return nextPossibleRowUp(row);
         else
-            return -1;
+            return INVALID_NUMBER;
     }
 
     private int reversedNextPossibleRow(PieceTypeEnum pieceType, int row){
@@ -127,21 +142,21 @@ public class MovementCalculations {
         else if(pieceType == PieceTypeEnum.pieceB)
             return nextPossibleRowDown(row);
         else
-            return -1;
+            return INVALID_NUMBER;
     }
 
     private int nextPossibleRowDown(int row){
         if(isRowValid(row + 1))
             return row + 1;
         else
-            return -1;
+            return INVALID_NUMBER;
     }
 
     private int nextPossibleRowUp(int row){
         if (isRowValid(row - 1))
             return row - 1;
         else
-            return -1;
+            return INVALID_NUMBER;
     }
 
     private boolean isTypeBlank(PieceTypeEnum pieceType){

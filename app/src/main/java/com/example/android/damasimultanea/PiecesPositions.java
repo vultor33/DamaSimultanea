@@ -20,13 +20,12 @@ public class PiecesPositions {
     }
 
     public PieceTypeEnum whichPiece(int position){
-        for(int i=0; i<ROW_SIZE; i++){
-            for(int j=0; j<COLUMN_SIZE; j++){
-                if(position == playablePositionsTable[i][j])
-                    return pieceTypeTable[i][j];
-            }
-        }
-        return PieceTypeEnum.NOTPLAYABLE;
+        return movementCalculations.whichPiece(position);
+    }
+
+    public ArrayList<Integer> possibleMovements(int position) {
+        movementCalculations.piecesAdjacencies(position);//fredmudar - so pra teste
+        return movementCalculations.possibleMovements(position);
     }
 
     public void movePiece(int piecePosition, int newPiecePosition){
@@ -39,11 +38,6 @@ public class PiecesPositions {
                     pieceTypeTable[i][j] = pieceType;
             }
         }
-    }
-
-    public ArrayList<Integer> possibleMovements(int position) {
-        movementCalculations.piecesAdjacencies(position);
-        return movementCalculations.possibleMovements(position);
     }
 
     PiecesPositions(){
