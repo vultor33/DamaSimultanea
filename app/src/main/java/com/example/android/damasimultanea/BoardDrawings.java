@@ -45,6 +45,9 @@ public class BoardDrawings {
     }
 
     public void playPiece(int position){
+        //TurnHandler
+        //CapturePiecesHandler -- ele anda no tabuleiro tod o e aponta quem captura quem.
+
         if(possibleMovements.contains(position))
             movePiece(position);
         else

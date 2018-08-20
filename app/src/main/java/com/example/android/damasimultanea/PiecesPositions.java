@@ -13,6 +13,8 @@ public class PiecesPositions {
     private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
     private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
 
+    private MovementCalculations movementCalculations;
+
     public int getTableSize(){
         return TABLE_SIZE;
     }
@@ -39,78 +41,9 @@ public class PiecesPositions {
         }
     }
 
-    public ArrayList<Integer> possibleMovements(int position){
-        ArrayList<Integer> movements = new ArrayList<>();
-
-        for(int i=0; i<ROW_SIZE; i++){
-            for(int j=0; j<COLUMN_SIZE; j++){
-                if(position == playablePositionsTable[i][j]) {
-                    if(pieceTypeTable[i][j] == PieceTypeEnum.pieceA){
-                        movementsForPieceX(movements,i,j);
-                        return movements;
-                    }
-                    else if(pieceTypeTable[i][j] == PieceTypeEnum.pieceB){
-                        movementsForPieceX(movements,i,j);
-                        return movements;
-                    }
-                }
-            }
-        }
-        return movements;
-    }
-
-    private void movementsForPieceX(ArrayList<Integer> movements, int row, int column1) {
-        int nextRow = nextPossibleRow(pieceTypeTable[row][column1], row);
-        int INVALID_ROW = -1;
-        if(nextRow != INVALID_ROW){
-            addMovement(movements, nextRow, column1);
-            int column2 = column1 + nextPossibleColumn(row);
-            addMovement(movements, nextRow, column2);
-        }
-    }
-
-    private void addMovement(ArrayList<Integer> movements, int row, int column){
-        if(isColumnValid(column)){
-            if(isTypeBlank(pieceTypeTable[row][column])){
-                movements.add(playablePositionsTable[row][column]);
-            }
-        }
-    }
-
-    private boolean isRowValid(int index){
-        return (index > -1) && (index < ROW_SIZE);
-    }
-
-    private boolean isColumnValid(int index){
-        return (index > -1) && (index < COLUMN_SIZE);
-    }
-
-    private int nextPossibleColumn(int row){
-        if(row % 2 == 0)
-            return -1;
-        else
-            return +1;
-    }
-
-    private int nextPossibleRow(PieceTypeEnum pieceType, int row){
-        if(pieceType == PieceTypeEnum.pieceA) {
-            if(isRowValid(row + 1))
-                return row + 1;
-            else
-                return -1;
-        }
-        else if(pieceType == PieceTypeEnum.pieceB) {
-            if (isRowValid(row - 1))
-                return row - 1;
-            else
-                return -1;
-        }
-        else
-            return -1;
-    }
-
-    private boolean isTypeBlank(PieceTypeEnum pieceType){
-        return pieceType == PieceTypeEnum.BLANK;
+    public ArrayList<Integer> possibleMovements(int position) {
+        movementCalculations.piecesAdjacencies(position);
+        return movementCalculations.possibleMovements(position);
     }
 
     PiecesPositions(){
@@ -195,5 +128,6 @@ public class PiecesPositions {
         pieceTypeTable[7][2] = PieceTypeEnum.pieceB;
         pieceTypeTable[7][3] = PieceTypeEnum.pieceB;
 
+        movementCalculations = new MovementCalculations(playablePositionsTable, pieceTypeTable);
     }
 }

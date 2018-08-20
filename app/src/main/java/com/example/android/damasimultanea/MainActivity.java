@@ -29,6 +29,7 @@ public class MainActivity
 
     @Override
     public void onItemClick(View view, int position) {
+        Log.d("fredmudar", "CLICKED POSITION: " + String.valueOf(position));
         adapter.playPiece(position);
     }
 
