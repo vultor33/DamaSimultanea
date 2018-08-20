@@ -2,6 +2,7 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import java.util.List;
 public class BoardDrawings {
 
     private PiecesPositions piecesPositions = new PiecesPositions();
-    private List<MyRecyclerViewAdapter.ViewHolder> allHolders = new ArrayList<>();
+    private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
     ArrayList<Integer> possibleMovements = new ArrayList<>();
     private int selectedPiece;
     private int NOT_SELECTED = -1;
@@ -23,7 +24,6 @@ public class BoardDrawings {
     private int highlightColor;
     private int backGroundPlayableColor;
     private int backGroundNotPlayableColor;
-
 
     BoardDrawings(@NotNull Context context){
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
@@ -39,7 +39,7 @@ public class BoardDrawings {
     }
 
     public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){
-        allHolders.add(position,holder);
+        allHolders[position] = holder;
         drawBackground(position);
         drawPiece(position);
     }
@@ -76,18 +76,18 @@ public class BoardDrawings {
         possibleMovements = piecesPositions.possibleMovements(position);
         if(possibleMovements.size() == 0)
             return;
-        allHolders.get(position).myTextView.setBackgroundColor(highlightColor);
+        allHolders[position].myTextView.setBackgroundColor(highlightColor);
         selectedPiece = position;
         for (Integer iMoves : possibleMovements) {
-            allHolders.get(iMoves).myTextView.setBackgroundColor(highlightColor);
+            allHolders[iMoves].myTextView.setBackgroundColor(highlightColor);
         }
     }
 
     private void clearHighlight(){
-        allHolders.get(selectedPiece).myTextView.setBackgroundColor(backGroundPlayableColor);
+        allHolders[selectedPiece].myTextView.setBackgroundColor(backGroundPlayableColor);
         selectedPiece = NOT_SELECTED;
         for (Integer iMoves : possibleMovements) {
-            allHolders.get(iMoves).myTextView.setBackgroundColor(backGroundPlayableColor);
+            allHolders[iMoves].myTextView.setBackgroundColor(backGroundPlayableColor);
         }
         possibleMovements.clear();
     }
@@ -95,30 +95,30 @@ public class BoardDrawings {
 
     private void drawBackground(int position){
         if (piecesPositions.whichPiece(position) != PieceTypeEnum.NOTPLAYABLE) {
-            allHolders.get(position).myTextView.setBackgroundColor(backGroundPlayableColor);
+            allHolders[position].myTextView.setBackgroundColor(backGroundPlayableColor);
         } else {
-            allHolders.get(position).myTextView.setBackgroundColor(backGroundNotPlayableColor);
+            allHolders[position].myTextView.setBackgroundColor(backGroundNotPlayableColor);
         }
     }
 
     private void drawPiece(int position){
         switch (piecesPositions.whichPiece(position)){
             case BLANK:
-                allHolders.get(position).pieceImage.setVisibility(View.INVISIBLE);
+                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
                 break;
 
             case pieceA:
-                allHolders.get(position).pieceImage.setVisibility(View.VISIBLE);
-                allHolders.get(position).pieceImage.setColorFilter(pieceSideAColor);
+                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
+                allHolders[position].pieceImage.setColorFilter(pieceSideAColor);
                 break;
 
             case pieceB:
-                allHolders.get(position).pieceImage.setVisibility(View.VISIBLE);
-                allHolders.get(position).pieceImage.setColorFilter(pieceSideBColor);
+                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
+                allHolders[position].pieceImage.setColorFilter(pieceSideBColor);
                 break;
 
             default:
-                allHolders.get(position).pieceImage.setVisibility(View.INVISIBLE);
+                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
         }
     }
 }

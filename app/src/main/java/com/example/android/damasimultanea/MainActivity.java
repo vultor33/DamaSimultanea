@@ -15,6 +15,7 @@ public class MainActivity
         extends AppCompatActivity
         implements MyRecyclerViewAdapter.ItemClickListener{
 
+    RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
     @Override
@@ -33,12 +34,12 @@ public class MainActivity
 
     void setTheRecyclerViewer(){
         Context context = this;
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rvNumbers);
+        mRecyclerViewer = (RecyclerView) findViewById(R.id.rvNumbers);
         int numberOfColumns = 8;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        mRecyclerViewer.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
         adapter = new MyRecyclerViewAdapter(this);
         adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        mRecyclerViewer.setAdapter(adapter);
     }
 
 }
