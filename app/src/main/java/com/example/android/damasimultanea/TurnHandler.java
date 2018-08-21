@@ -1,84 +1,105 @@
 package com.example.android.damasimultanea;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class TurnHandler {
 
     private int NOT_SELECTED = -1;
+    private int selectedPiecePosition = NOT_SELECTED;
+    private PieceTypeEnum selectedPiece = PieceTypeEnum.NOTPLAYABLE;
+    private ArrayList<Integer> possibleMovements = new ArrayList<>();
     private class PlayerData{
-        private int selectedPiecePosition = NOT_SELECTED;
-        ArrayList<Integer> possibleMovements = new ArrayList<>();
-        boolean played;
+        int movedTryPosition = NOT_SELECTED;
+        int position = NOT_SELECTED;
         PieceTypeEnum pieceType;
-    }
 
+        public void clear(){
+            movedTryPosition = NOT_SELECTED;
+            position = NOT_SELECTED;
+        }
+    }
     private PlayerData player1 = new PlayerData();
     private PlayerData player2 = new PlayerData();
 
-    public TurnHandler(){
+    TurnHandler(){
         player1.pieceType = PieceTypeEnum.pieceA;
         player2.pieceType = PieceTypeEnum.pieceB;
     }
 
+    public boolean isTurnEnded(){
+        return ((player1.position != NOT_SELECTED) && (player2.position != NOT_SELECTED));
+    }
+
     //PIECE
-    public void setSelectedPiecePosition(int selectedPiece_in){
-        player1.selectedPiecePosition = selectedPiece_in;
+    public void setSelectedPiece(int selectedPiecePosition_in, PieceTypeEnum piece_in){
+        selectedPiecePosition = selectedPiecePosition_in;
+        selectedPiece = piece_in;
     }
 
     public boolean isSelected(int position){
-        return position == player1.selectedPiecePosition;
+        return position == selectedPiecePosition;
     }
 
     public int getSelectedPiecePosition(){
-        return player1.selectedPiecePosition;
+        return selectedPiecePosition;
     }
 
     public void clearSelectedPiece(){
-        player1.selectedPiecePosition = NOT_SELECTED;
+        selectedPiecePosition = NOT_SELECTED;
+    }
+
+    public boolean isSelectionPossible(int position, PieceTypeEnum piece){
+        if((player1.position != NOT_SELECTED) && (player1.pieceType == piece))
+            return  false;
+        else if((player2.position != NOT_SELECTED) && (player2.pieceType == piece))
+            return false;
+
+        boolean player1Moved = player1.position == position;
+        boolean player2Moved = player2.position == position;
+        return !(player1Moved || player2Moved);
     }
 
 
     //MOVEMENTS
     public void setPossibleMovements(ArrayList<Integer> possibleMovements_in){
-        player1.possibleMovements = possibleMovements_in;
+        possibleMovements = possibleMovements_in;
     }
 
     public boolean isMovementPossible(){
-        return player1.possibleMovements.size() > 0;
+        return possibleMovements.size() > 0;
     }
 
     public ArrayList<Integer> getPossibleMovements() {
-        return player1.possibleMovements;
+        return possibleMovements;
     }
 
     public void clearPossibleMovements(){
-        player1.possibleMovements.clear();
+        possibleMovements.clear();
     }
 
     public boolean isPositionAPossibleMovement(int position){
-        return player1.possibleMovements.contains(position);
+        return possibleMovements.contains(position);
     }
 
-    /*ArrayList<PieceTypeEnum> alreadyPlayed
-    public boolean isPlayersTurn(PieceTypeEnum piece_in){
-        return !alreadyPlayed.contains(piece_in);
+    public void askingToMovePiece(int position){
+        if(player1.pieceType == selectedPiece){
+            player1.movedTryPosition = position;
+            player1.position = selectedPiecePosition;
+        }
+        else if(player2.pieceType == selectedPiece){
+            player2.movedTryPosition = position;
+            player2.position = selectedPiecePosition;
+        }
+        selectedPiecePosition = NOT_SELECTED;
+        selectedPiece = PieceTypeEnum.NOTPLAYABLE;
+        possibleMovements.clear();
     }
-
-    public void addPlayed(PieceTypeEnum piece_in){
-        alreadyPlayed.add(piece_in);
-    }
-
-    public void clearPlayedMoves(){
-        alreadyPlayed.clear();
-    }
-    */
-
-
-
 
     public boolean isValidSelection(PieceTypeEnum piece){
         boolean isPiece = (piece != PieceTypeEnum.NOTPLAYABLE) && (piece != PieceTypeEnum.BLANK);
-        boolean isAvailable = player1.selectedPiecePosition == NOT_SELECTED;
+        boolean isAvailable = selectedPiecePosition == NOT_SELECTED;
         return isPiece && isAvailable;
     }
 

@@ -3,6 +3,7 @@ package com.example.android.damasimultanea;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +49,9 @@ public class BoardDrawings {
         else
             highlightMovements(position);
 
+        if(turnHandler.isTurnEnded())
+            Log.d("fredmudar", "CABOU O TURNO");
+
     }
 
     private void movePiece(int toPosition){
@@ -58,7 +62,8 @@ public class BoardDrawings {
     }
 
     private void setPieceMovement(int toPosition){
-        allHolders[toPosition].myTextView.setBackgroundColor(Color.GREEN);
+        allHolders[toPosition].myTextView.setBackgroundColor(Color.GREEN);//fredmudar mudar essa definicao de cor
+        turnHandler.askingToMovePiece(toPosition);
     }
 
     private void highlightMovements(int position){
@@ -70,10 +75,14 @@ public class BoardDrawings {
     }
 
     private void highlightSelectedPiece(int position){
+        PieceTypeEnum piece = piecesPositions.whichPiece(position);
+        if(!turnHandler.isSelectionPossible(position, piece))
+            return;
+        Log.d("fredmudar","position:  " + String.valueOf(position));
         turnHandler.setPossibleMovements(piecesPositions.possibleMovements(position));
         if(turnHandler.isMovementPossible()) {
             allHolders[position].myTextView.setBackgroundColor(highlightColor);
-            turnHandler.setSelectedPiecePosition(position);
+            turnHandler.setSelectedPiece(position, piece);
             for (Integer iMoves : turnHandler.getPossibleMovements()) {
                 allHolders[iMoves].myTextView.setBackgroundColor(highlightColor);
             }
