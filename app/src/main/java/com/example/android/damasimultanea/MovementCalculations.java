@@ -11,10 +11,10 @@ public class MovementCalculations {
     private int[][] playablePositionsTable;
     private PieceTypeEnum[][] pieceTypeTable;
 
-    boolean reversedMovement;
-    boolean rawPossibleMovements;
-    int columnBlock;
-    Random rand = new Random();
+    private boolean reversedMovement;
+    private boolean rawPossibleMovements;
+    private int columnBlock;
+    private Random rand = new Random();
 
     private class PositionData{
         ArrayList<Integer> moves = new ArrayList<>();
@@ -62,7 +62,21 @@ public class MovementCalculations {
 
     }
 
-    public void allPossibleCaptures(
+    public void movePieceXToPositionY(int startPosition, int finalPosition){
+        PieceTypeEnum piece = whichPiece(startPosition);
+        for(int row=0; row<ROW_SIZE; row++) {
+            for (int column = 0; column < COLUMN_SIZE; column++) {
+                if (startPosition == playablePositionsTable[row][column]) {
+                    deletePiece(row, column);
+                }
+                if (finalPosition == playablePositionsTable[row][column]) {
+                    createPiece(piece, row, column);
+                }
+            }
+        }
+    }
+
+    private void allPossibleCaptures(
             ArrayList< ArrayList<PositionData> > capturesPiecesMatrix,
             ArrayList<Integer> capturesOriginPieces){
 
@@ -75,7 +89,7 @@ public class MovementCalculations {
         }
     }
 
-    public ArrayList<PositionData> piecesAdjacencies(int position) {
+    private ArrayList<PositionData> piecesAdjacencies(int position) {
         ArrayList<PositionData> allCapturesPieces = new ArrayList<>();
         reversedMovement = false;
         rawPossibleMovements = true;
@@ -85,19 +99,13 @@ public class MovementCalculations {
         reversedMovement = true;
         rawPossibleMovements = false;
         columnBlock = selectedPiece.columnOfSelected;
-        ArrayList<Integer> possibleCapturesPieces = new ArrayList<>();
         for (Integer selectedMoves : selectedPiece.moves) {
             PositionData adjacentPiece = allPossibleMovements(selectedMoves);
             if(adjacentPiece.piece == selectedPiece.piece)
                 continue;
-            if((adjacentPiece.position != INVALID_NUMBER) && (adjacentPiece.moves.size() > 0)) {
-                possibleCapturesPieces.add(adjacentPiece.position);
+            if((adjacentPiece.position != INVALID_NUMBER) && (adjacentPiece.moves.size() > 0))
                 allCapturesPieces.add(adjacentPiece);
-            }
         }
-    //    for (Integer iMoves : possibleCapturesPieces) {
-      //      Log.d("fredmudar", "captures:  " + String.valueOf(iMoves));
-        //}
         return allCapturesPieces;
     }
 
@@ -107,20 +115,6 @@ public class MovementCalculations {
 
     private void createPiece(PieceTypeEnum piece, int row, int column){
         pieceTypeTable[row][column] = piece;
-    }
-
-    private void movePieceXToPositionY(int startPosition, int finalPosition){
-        PieceTypeEnum piece = whichPiece(startPosition);
-        for(int row=0; row<ROW_SIZE; row++) {
-            for (int column = 0; column < COLUMN_SIZE; column++) {
-                if (startPosition == playablePositionsTable[row][column]) {
-                    deletePiece(row, column);
-                }
-                if (finalPosition == playablePositionsTable[row][column]) {
-                    createPiece(piece, row, column);
-                }
-            }
-        }
     }
 
     public ArrayList<Integer> possibleMovements(int position) {

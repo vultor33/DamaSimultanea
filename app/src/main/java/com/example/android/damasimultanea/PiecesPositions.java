@@ -7,16 +7,15 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PiecesPositions {
-    final private int TABLE_SIZE = 64;
-    final int ROW_SIZE = 8;
-    final int COLUMN_SIZE = 4;
+    final private int ROW_SIZE = 8;
+    final private int COLUMN_SIZE = 4;
     private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
     private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
 
     private MovementCalculations movementCalculations;
 
     public int getTableSize(){
-        return TABLE_SIZE;
+        return ROW_SIZE * COLUMN_SIZE * 2;
     }
 
     public PieceTypeEnum whichPiece(int position){
@@ -31,17 +30,8 @@ public class PiecesPositions {
         movementCalculations.captureAllPossiblePieces();
     }
 
-
     public void movePiece(int piecePosition, int newPiecePosition){
-        PieceTypeEnum pieceType = whichPiece(piecePosition);
-        for(int i=0; i<ROW_SIZE; i++){
-            for(int j=0; j<COLUMN_SIZE; j++){
-                if(piecePosition == playablePositionsTable[i][j])
-                    pieceTypeTable[i][j] = PieceTypeEnum.BLANK;
-                if(newPiecePosition == playablePositionsTable[i][j])
-                    pieceTypeTable[i][j] = pieceType;
-            }
-        }
+        movementCalculations.movePieceXToPositionY(piecePosition,newPiecePosition);
     }
 
     PiecesPositions(){

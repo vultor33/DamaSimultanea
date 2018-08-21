@@ -44,14 +44,8 @@ public class BoardDrawings {
         drawPiece(position);
     }
 
-    public void drawAllPieces(){
-        for(int i = 0; i < getTableSize(); i++)
-            drawPiece(i);
-    }
-
     public void playPiece(int position){
         //TurnHandler
-        //CapturePiecesHandler -- ele anda no tabuleiro tod o e aponta quem captura quem.
 
         if(possibleMovements.contains(position)) {
             movePiece(position);
@@ -61,6 +55,15 @@ public class BoardDrawings {
         else
             highlightMovements(position);
 
+    }
+
+
+    // highlight de verde o movimento pretendido.
+    // bloqueia aquela peca
+
+    private void drawAllPieces(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawPiece(i);
     }
 
     private void movePiece(int toPosition){
