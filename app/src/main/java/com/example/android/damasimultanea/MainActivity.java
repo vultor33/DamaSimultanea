@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -42,6 +45,29 @@ public class MainActivity
         adapter.setClickListener(this);
         mRecyclerViewer.setAdapter(adapter);
     }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.dama_menu, menu);
+        return true;
+    }
+
+    // COMPLETED (7) Override onOptionsItemSelected to handle clicks on the refresh button
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.dama_menu) {
+            adapter.endTurn();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }
 

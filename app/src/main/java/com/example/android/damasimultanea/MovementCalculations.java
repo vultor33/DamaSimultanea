@@ -109,6 +109,16 @@ public class MovementCalculations {
         return allCapturesPieces;
     }
 
+    public void deletePiece(int position){
+        for(int row=0; row<ROW_SIZE; row++) {
+            for (int column = 0; column < COLUMN_SIZE; column++) {
+                if (position == playablePositionsTable[row][column]) {
+                    pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
+                }
+            }
+        }
+    }
+
     private void deletePiece(int row, int column){
         pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
     }

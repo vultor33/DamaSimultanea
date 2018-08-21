@@ -34,6 +34,10 @@ public class PiecesPositions {
         movementCalculations.movePieceXToPositionY(piecePosition,newPiecePosition);
     }
 
+    public void deletePiece(int position){
+        movementCalculations.deletePiece(position);
+    }
+
     PiecesPositions(){
 
         playablePositionsTable[0][0] = 0;

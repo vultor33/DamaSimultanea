@@ -32,6 +32,28 @@ public class TurnHandler {
         return ((player1.position != NOT_SELECTED) && (player2.position != NOT_SELECTED));
     }
 
+    public void clearAllPlayersData(){
+        player1.clear();
+        player2.clear();
+    }
+
+    public int getPlayer1Position(){
+        return player1.position;
+    }
+
+    public int getPlayer2Position(){
+        return player2.position;
+    }
+
+    public int getPlayer1Destination(){
+        return player1.movedTryPosition;
+    }
+
+    public int getPlayer2Destination(){
+        return player2.movedTryPosition;
+    }
+
+
     //PIECE
     public void setSelectedPiece(int selectedPiecePosition_in, PieceTypeEnum piece_in){
         selectedPiecePosition = selectedPiecePosition_in;

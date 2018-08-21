@@ -40,26 +40,34 @@ public class BoardDrawings {
     }
 
     public void playPiece(int position){
-        if(turnHandler.isPositionAPossibleMovement(position)) {
-            //movePiece(position); //highlight green
+        if(turnHandler.isPositionAPossibleMovement(position))
             setPieceMovement(position);
-            piecesPositions.captureAllPossiblePieces();
-            drawAllPieces();
-        }
         else
             highlightMovements(position);
-
-        if(turnHandler.isTurnEnded())
-            Log.d("fredmudar", "CABOU O TURNO");
-
     }
 
-    private void movePiece(int toPosition){
-        piecesPositions.movePiece(turnHandler.getSelectedPiecePosition(), toPosition);
-        drawPiece(toPosition);
-        drawPiece(turnHandler.getSelectedPiecePosition());
-        clearHighlight();
+    public void resolveAllMovements(){
+        if(!turnHandler.isTurnEnded())
+            return;
+
+        if(turnHandler.getPlayer1Destination() == turnHandler.getPlayer2Destination()) {
+            piecesPositions.deletePiece(turnHandler.getPlayer1Position());
+            piecesPositions.deletePiece(turnHandler.getPlayer2Position());
+            piecesPositions.captureAllPossiblePieces();
+            turnHandler.clearAllPlayersData();
+            drawAllPieces();
+            drawAllBackground();
+        }
+        else {
+            piecesPositions.movePiece(turnHandler.getPlayer1Position(),turnHandler.getPlayer1Destination());
+            piecesPositions.movePiece(turnHandler.getPlayer2Position(),turnHandler.getPlayer2Destination());
+            piecesPositions.captureAllPossiblePieces();
+            turnHandler.clearAllPlayersData();
+            drawAllPieces();
+            drawAllBackground();
+        }
     }
+
 
     private void setPieceMovement(int toPosition){
         allHolders[toPosition].myTextView.setBackgroundColor(Color.GREEN);//fredmudar mudar essa definicao de cor
@@ -115,6 +123,11 @@ public class BoardDrawings {
     private void drawAllPieces(){
         for(int i = 0; i < getTableSize(); i++)
             drawPiece(i);
+    }
+
+    private void drawAllBackground(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawBackground(i);
     }
 
     private void drawPiece(int position){
