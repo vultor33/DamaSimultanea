@@ -1,22 +1,17 @@
 package com.example.android.damasimultanea;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BoardDrawings {
 
+    private TurnHandler turnHandler = new TurnHandler();
     private PiecesPositions piecesPositions = new PiecesPositions();
     private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
-    ArrayList<Integer> possibleMovements = new ArrayList<>();
-    private int selectedPiece;
-    private int NOT_SELECTED = -1;
 
     //Colors
     private int pieceSideAColor;
@@ -31,7 +26,6 @@ public class BoardDrawings {
         highlightColor = ContextCompat.getColor(context, R.color.highLight);
         backGroundPlayableColor = ContextCompat.getColor(context, R.color.colorPrimaryDark);
         backGroundNotPlayableColor = ContextCompat.getColor(context, R.color.colorAccent);
-        selectedPiece = NOT_SELECTED;
     }
 
     public int getTableSize(){
@@ -45,10 +39,9 @@ public class BoardDrawings {
     }
 
     public void playPiece(int position){
-        //TurnHandler
-
-        if(possibleMovements.contains(position)) {
-            movePiece(position);
+        if(turnHandler.isPositionAPossibleMovement(position)) {
+            //movePiece(position); //highlight green
+            setPieceMovement(position);
             piecesPositions.captureAllPossiblePieces();
             drawAllPieces();
         }
@@ -57,55 +50,49 @@ public class BoardDrawings {
 
     }
 
-
-    // highlight de verde o movimento pretendido.
-    // bloqueia aquela peca
-
-    private void drawAllPieces(){
-        for(int i = 0; i < getTableSize(); i++)
-            drawPiece(i);
+    private void movePiece(int toPosition){
+        piecesPositions.movePiece(turnHandler.getSelectedPiecePosition(), toPosition);
+        drawPiece(toPosition);
+        drawPiece(turnHandler.getSelectedPiecePosition());
+        clearHighlight();
     }
 
-    private void movePiece(int toPosition){
-        piecesPositions.movePiece(selectedPiece, toPosition);
-        drawPiece(toPosition);
-        drawPiece(selectedPiece);
-        clearHighlight();
+    private void setPieceMovement(int toPosition){
+        allHolders[toPosition].myTextView.setBackgroundColor(Color.GREEN);
     }
 
     private void highlightMovements(int position){
         PieceTypeEnum piece = piecesPositions.whichPiece(position);
-        if(position == selectedPiece)
+        if(turnHandler.isSelected(position))
             clearHighlight();
-        else if(isValidSelection(piece))
+        else if(turnHandler.isValidSelection(piece))
             highlightSelectedPiece(position);
     }
 
-    private boolean isValidSelection(PieceTypeEnum piece){
-        boolean isPiece = (piece != PieceTypeEnum.NOTPLAYABLE) && (piece != PieceTypeEnum.BLANK);
-        boolean isAvailable = selectedPiece == NOT_SELECTED;
-        return isPiece && isAvailable;
-    }
-
     private void highlightSelectedPiece(int position){
-        possibleMovements = piecesPositions.possibleMovements(position);
-        if(possibleMovements.size() == 0)
-            return;
-        allHolders[position].myTextView.setBackgroundColor(highlightColor);
-        selectedPiece = position;
-        for (Integer iMoves : possibleMovements) {
-            allHolders[iMoves].myTextView.setBackgroundColor(highlightColor);
+        turnHandler.setPossibleMovements(piecesPositions.possibleMovements(position));
+        if(turnHandler.isMovementPossible()) {
+            allHolders[position].myTextView.setBackgroundColor(highlightColor);
+            turnHandler.setSelectedPiecePosition(position);
+            for (Integer iMoves : turnHandler.getPossibleMovements()) {
+                allHolders[iMoves].myTextView.setBackgroundColor(highlightColor);
+            }
         }
     }
 
     private void clearHighlight(){
-        allHolders[selectedPiece].myTextView.setBackgroundColor(backGroundPlayableColor);
-        selectedPiece = NOT_SELECTED;
-        for (Integer iMoves : possibleMovements) {
+        allHolders[turnHandler.getSelectedPiecePosition()].myTextView.setBackgroundColor(backGroundPlayableColor);
+        turnHandler.clearSelectedPiece();
+        for (Integer iMoves : turnHandler.getPossibleMovements()) {
             allHolders[iMoves].myTextView.setBackgroundColor(backGroundPlayableColor);
         }
-        possibleMovements.clear();
+        turnHandler.clearPossibleMovements();
     }
+
+
+
+
+
 
 
     private void drawBackground(int position){
@@ -114,6 +101,11 @@ public class BoardDrawings {
         } else {
             allHolders[position].myTextView.setBackgroundColor(backGroundNotPlayableColor);
         }
+    }
+
+    private void drawAllPieces(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawPiece(i);
     }
 
     private void drawPiece(int position){
