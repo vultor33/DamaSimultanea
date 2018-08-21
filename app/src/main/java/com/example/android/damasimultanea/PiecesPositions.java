@@ -24,9 +24,13 @@ public class PiecesPositions {
     }
 
     public ArrayList<Integer> possibleMovements(int position) {
-        movementCalculations.piecesAdjacencies(position);//fredmudar - so pra teste
         return movementCalculations.possibleMovements(position);
     }
+
+    public void captureAllPossiblePieces(){
+        movementCalculations.captureAllPossiblePieces();
+    }
+
 
     public void movePiece(int piecePosition, int newPiecePosition){
         PieceTypeEnum pieceType = whichPiece(piecePosition);

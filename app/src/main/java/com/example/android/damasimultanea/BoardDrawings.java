@@ -44,14 +44,23 @@ public class BoardDrawings {
         drawPiece(position);
     }
 
+    public void drawAllPieces(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawPiece(i);
+    }
+
     public void playPiece(int position){
         //TurnHandler
         //CapturePiecesHandler -- ele anda no tabuleiro tod o e aponta quem captura quem.
 
-        if(possibleMovements.contains(position))
+        if(possibleMovements.contains(position)) {
             movePiece(position);
+            piecesPositions.captureAllPossiblePieces();
+            drawAllPieces();
+        }
         else
             highlightMovements(position);
+
     }
 
     private void movePiece(int toPosition){

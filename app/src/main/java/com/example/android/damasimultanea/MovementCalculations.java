@@ -1,7 +1,7 @@
 package com.example.android.damasimultanea;
 
 import android.util.Log;
-
+import java.util.Random;
 import java.util.ArrayList;
 
 public class MovementCalculations {
@@ -14,6 +14,7 @@ public class MovementCalculations {
     boolean reversedMovement;
     boolean rawPossibleMovements;
     int columnBlock;
+    Random rand = new Random();
 
     private class PositionData{
         ArrayList<Integer> moves = new ArrayList<>();
@@ -40,7 +41,42 @@ public class MovementCalculations {
         return PieceTypeEnum.NOTPLAYABLE;
     }
 
-    public void piecesAdjacencies(int position) {
+
+    public void captureAllPossiblePieces(){
+        while(true){
+            ArrayList< ArrayList<PositionData> > capturesPiecesMatrix = new ArrayList<>();
+            ArrayList<Integer> capturesOriginPieces = new ArrayList<>();
+            allPossibleCaptures(capturesPiecesMatrix,capturesOriginPieces);
+            if(capturesOriginPieces.size() == 0)
+                break;
+
+            int chosenCapture = rand.nextInt(capturesOriginPieces.size());
+            int pieceToCapturePosition = capturesOriginPieces.get(chosenCapture);
+            ArrayList<PositionData> possibleCapturePieces = capturesPiecesMatrix.get(chosenCapture);
+            int chosenPiece = rand.nextInt(possibleCapturePieces.size());
+            PositionData capturedPosData = possibleCapturePieces.get(chosenPiece);
+
+            deletePiece(capturedPosData.rowOfSelected, capturedPosData.columnOfSelected);
+            movePieceXToPositionY(pieceToCapturePosition,capturedPosData.moves.get(0));
+        }
+
+    }
+
+    public void allPossibleCaptures(
+            ArrayList< ArrayList<PositionData> > capturesPiecesMatrix,
+            ArrayList<Integer> capturesOriginPieces){
+
+        for(int i = 0; i < (ROW_SIZE * COLUMN_SIZE * 2); i++){
+            ArrayList<PositionData> capturedPieces = piecesAdjacencies(i);
+            if(capturedPieces.size() > 0){
+                capturesPiecesMatrix.add(capturedPieces);
+                capturesOriginPieces.add(i);
+            }
+        }
+    }
+
+    public ArrayList<PositionData> piecesAdjacencies(int position) {
+        ArrayList<PositionData> allCapturesPieces = new ArrayList<>();
         reversedMovement = false;
         rawPossibleMovements = true;
         columnBlock = INVALID_NUMBER;
@@ -54,11 +90,36 @@ public class MovementCalculations {
             PositionData adjacentPiece = allPossibleMovements(selectedMoves);
             if(adjacentPiece.piece == selectedPiece.piece)
                 continue;
-            if((adjacentPiece.position != INVALID_NUMBER) && (adjacentPiece.moves.size() > 0))
+            if((adjacentPiece.position != INVALID_NUMBER) && (adjacentPiece.moves.size() > 0)) {
                 possibleCapturesPieces.add(adjacentPiece.position);
+                allCapturesPieces.add(adjacentPiece);
+            }
         }
-        for (Integer iMoves : possibleCapturesPieces) {
-            Log.d("fredmudar", "captures:  " + String.valueOf(iMoves));
+    //    for (Integer iMoves : possibleCapturesPieces) {
+      //      Log.d("fredmudar", "captures:  " + String.valueOf(iMoves));
+        //}
+        return allCapturesPieces;
+    }
+
+    private void deletePiece(int row, int column){
+        pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
+    }
+
+    private void createPiece(PieceTypeEnum piece, int row, int column){
+        pieceTypeTable[row][column] = piece;
+    }
+
+    private void movePieceXToPositionY(int startPosition, int finalPosition){
+        PieceTypeEnum piece = whichPiece(startPosition);
+        for(int row=0; row<ROW_SIZE; row++) {
+            for (int column = 0; column < COLUMN_SIZE; column++) {
+                if (startPosition == playablePositionsTable[row][column]) {
+                    deletePiece(row, column);
+                }
+                if (finalPosition == playablePositionsTable[row][column]) {
+                    createPiece(piece, row, column);
+                }
+            }
         }
     }
 
