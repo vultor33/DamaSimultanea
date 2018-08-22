@@ -18,6 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.android.damasimultanea.database.AppDatabase;
+import com.example.android.damasimultanea.database.PieceEntry;
+
+import java.util.List;
+
 // android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
 public class MainActivity
         extends AppCompatActivity
@@ -26,12 +31,18 @@ public class MainActivity
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
+    private AppDatabase pieceDatabase;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         setTheRecyclerViewer();
+
+        pieceDatabase = AppDatabase.getInstance(getApplicationContext());
 
     }
 
@@ -63,8 +74,24 @@ public class MainActivity
         int id = item.getItemId();
 
         if (id == R.id.dama_menu) {
-            adapter.endTurn();
 
+            Log.d("fredmudar","criando");
+            PieceEntry pieceEntry = new PieceEntry(7,0,1,2,4);
+            Log.d("fredmudar","entry");
+
+            //pieceDatabase.taskDao().insertTask(pieceEntry);
+
+            Log.d("fredmudar", "inserted with sucess");
+
+            List<PieceEntry> allPieces = pieceDatabase.taskDao().loadAllPieces();
+
+            Log.d("fredmudar","inserted:  " + String.valueOf(allPieces.size()));
+            for(int i = 0; i < allPieces.size(); i++){
+                Log.d("fredmudar", "pos:  " + String.valueOf(allPieces.get(i).getPosition()));
+                pieceDatabase.taskDao().deletePiece(allPieces.get(i));
+            }
+
+            adapter.endTurn();
             return true;
         }
 

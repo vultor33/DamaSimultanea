@@ -14,7 +14,7 @@ public class PieceDatabaseHandler{
         PieceEntry pieceEntry = new PieceEntry(3,0,1,2,4);
         Log.d("fredmudar","entry");
 
-        mDb.taskDao().insertTask(pieceEntry);
+        mDb.taskDao().insertPiece(pieceEntry);
 
         Log.d("fredmudar","inserted");
 

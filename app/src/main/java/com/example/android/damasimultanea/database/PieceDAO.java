@@ -12,14 +12,14 @@ import java.util.List;
 @Dao
 public interface PieceDAO {
     @Query("SELECT * FROM piece ORDER BY position") //devia trocar para is playable
-    List<PieceEntry> loadAllTasks();
+    List<PieceEntry> loadAllPieces();
 
     @Insert
-    void insertTask(PieceEntry taskEntry);
+    void insertPiece(PieceEntry pieceEntry);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateTask(PieceEntry taskEntry);
+    void updatePiece(PieceEntry pieceEntry);
 
     @Delete
-    void deleteTask(PieceEntry taskEntry);
+    void deletePiece(PieceEntry pieceEntry);
 }

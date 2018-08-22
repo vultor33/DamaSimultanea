@@ -1,25 +1,47 @@
 package com.example.android.damasimultanea.database;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "piece")
 public class PieceEntry {
 
     @PrimaryKey(autoGenerate = true)
-    private int position;
+    private int id;
 
-    private int isPlayable;
+    private int position;
     private int pieceType; //TODO - colocar o tipo estanho aqui e fazer a conversao depois - playable conversao para blue
     private int row;
     private int column;
 
+    private int isPlayable;
+
+
+    public PieceEntry(int id, int position, int isPlayable, int pieceType, int row, int column) {
+        this.id = id;
+        this.position = position;
+        this.isPlayable = isPlayable;
+        this.pieceType = pieceType;
+        this.row = row;
+        this.column = column;
+    }
+
+    @Ignore
     public PieceEntry(int position, int isPlayable, int pieceType, int row, int column) {
         this.position = position;
         this.isPlayable = isPlayable;
         this.pieceType = pieceType;
         this.row = row;
         this.column = column;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+      return id;
     }
 
     public int getPosition() {
