@@ -13,18 +13,36 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.damasimultanea.database.PieceEntry;
+
 import java.util.Arrays;
+import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
     private BoardDrawings boardDrawings;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private List<PieceEntry> allBoardDb;
 
     MyRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         boardDrawings = new BoardDrawings(context);
     }
+
+
+    public void setAllBoardDb(List<PieceEntry> allBoardDb_in){
+        if(allBoardDb_in == null)
+            Log.d("fredmudar", "nao conseguiu ler no banco de dados");
+        allBoardDb = allBoardDb_in;
+    }
+
+    public int getBoardPos(int pos){
+        if(allBoardDb == null)
+            Log.d("fredmudar", "e null essa joca");
+        return allBoardDb.get(pos).getPosition();
+    }
+
 
     @NonNull
     @Override

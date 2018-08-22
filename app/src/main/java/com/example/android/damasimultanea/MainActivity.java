@@ -2,6 +2,7 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -22,6 +23,7 @@ import com.example.android.damasimultanea.database.AppDatabase;
 import com.example.android.damasimultanea.database.PieceEntry;
 
 import java.util.List;
+import java.util.logging.Handler;
 
 // TODO remover android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
 public class MainActivity
@@ -31,11 +33,33 @@ public class MainActivity
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
+    AppDatabase pieceDatabase;
+    List<PieceEntry> allBoardDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTheRecyclerViewer();
+
+        pieceDatabase = AppDatabase.getInstance(getApplicationContext());
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<PieceEntry> allBoard = pieceDatabase.taskDao().loadAllPieces();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //allBoardDb = allBoard;
+                        adapter.setAllBoardDb(allBoard);//TODO remover essas coisas no main thread
+                    }
+                });
+            }
+        });
+
+
+
     }
 
     @Override
@@ -67,6 +91,11 @@ public class MainActivity
 
         if (id == R.id.dama_menu) {
             adapter.endTurn();
+
+            Log.d("fredmudar", "uma pos:  " + String.valueOf(adapter.getBoardPos(4)));
+
+
+
             return true;
         }
 

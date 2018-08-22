@@ -1,5 +1,7 @@
 package com.example.android.damasimultanea;
 
+import android.util.Log;
+
 import com.example.android.damasimultanea.database.PieceEntry;
 
 import java.util.List;
@@ -27,6 +29,8 @@ public class MovementCalculations {
     }
 
     MovementCalculations(List<PieceEntry> allBoard_in){
+        if(allBoard_in == null)
+            Log.d("fredmudar", "null no movement calculations");
         allBoard = allBoard_in;
         ROW_SIZE = 8;
         COLUMN_SIZE = 4;
