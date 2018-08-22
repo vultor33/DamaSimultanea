@@ -10,15 +10,11 @@ import java.util.ArrayList;
 
 public class MovementCalculations {
     private int INVALID_NUMBER = -1;
-    List<PieceEntry> allBoard;
-
+    private List<PieceEntry> allBoard;
 
     private int ROW_SIZE;
     private int COLUMN_SIZE;
     private int tableSize;
-    private int[][] playablePositionsTable;
-    private PieceTypeEnum[][] pieceTypeTable;
-
     private boolean reversedMovement;
     private boolean rawPossibleMovements;
     private int columnBlock;
@@ -32,24 +28,15 @@ public class MovementCalculations {
         PieceTypeEnum piece = PieceTypeEnum.NOTPLAYABLE;
     }
 
-    MovementCalculations(int[][] playablePositionsTable_in,  PieceTypeEnum[][] pieceTypeTable_in, List<PieceEntry> allBoard_in){
+    MovementCalculations(List<PieceEntry> allBoard_in){
         allBoard = allBoard_in;
-        playablePositionsTable = playablePositionsTable_in;
-        pieceTypeTable = pieceTypeTable_in;
-        ROW_SIZE = playablePositionsTable.length;
-        COLUMN_SIZE = playablePositionsTable[0].length;
+        ROW_SIZE = 8;
+        COLUMN_SIZE = 4;
         tableSize = (ROW_SIZE * COLUMN_SIZE * 2);
     }
 
     public PieceTypeEnum whichPiece(int position){
-        //return allBoard.get(position).getPieceType();
-        for(int i=0; i<ROW_SIZE; i++){
-            for(int j=0; j<COLUMN_SIZE; j++){
-                if(position == playablePositionsTable[i][j])
-                    return pieceTypeTable[i][j];
-            }
-        }
-        return PieceTypeEnum.NOTPLAYABLE;
+        return allBoard.get(position).getPieceType();
     }
 
 
@@ -75,16 +62,8 @@ public class MovementCalculations {
 
     public void movePieceXToPositionY(int startPosition, int finalPosition){
         PieceTypeEnum piece = whichPiece(startPosition);
-        for(int row=0; row<ROW_SIZE; row++) {
-            for (int column = 0; column < COLUMN_SIZE; column++) {
-                if (startPosition == playablePositionsTable[row][column]) {
-                    deletePiece(row, column);
-                }
-                if (finalPosition == playablePositionsTable[row][column]) {
-                    createPiece(piece, row, column);
-                }
-            }
-        }
+        deletePiece(startPosition);
+        createPieceAtPosition(finalPosition,piece);
     }
 
     private void allPossibleCaptures(
@@ -120,16 +99,6 @@ public class MovementCalculations {
         return allCapturesPieces;
     }
 
-    public void deletePiece(int position){
-        for(int row=0; row<ROW_SIZE; row++) {
-            for (int column = 0; column < COLUMN_SIZE; column++) {
-                if (position == playablePositionsTable[row][column]) {
-                    pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
-                }
-            }
-        }
-    }
-
     public boolean isBothPiecesMovable(){
         boolean pieceAHaveMovement = false;
         boolean pieceBHaveMoevement = false;
@@ -151,9 +120,12 @@ public class MovementCalculations {
         int pieceBPoints = 0;
         for(int j = 0; j < COLUMN_SIZE; j++)
         {
-            if(pieceTypeTable[0][j] == PieceTypeEnum.pieceB)
+            int positionFinalA = positionFromRowAndColumn(0,j);
+            int positionFinalB = positionFromRowAndColumn(ROW_SIZE-1,j);
+
+            if(whichPiece(positionFinalA) == PieceTypeEnum.pieceB)
                 pieceBPoints += 1;
-            if(pieceTypeTable[7][j] == PieceTypeEnum.pieceA)
+            if(whichPiece(positionFinalB) == PieceTypeEnum.pieceA)
                 pieceAPoints += 1;
         }
         if(pieceAPoints > pieceBPoints)
@@ -172,39 +144,35 @@ public class MovementCalculations {
         return allPossibleMovements(position).moves;
     }
 
-    private void deletePiece(int row, int column){
-        pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
+    private void deletePiece(int row, int column){ // fredmudar procurar formas de deletar esse cara
+        int position = positionFromRowAndColumn(row,column);
+        deletePiece(position);
     }
 
-    private void createPiece(PieceTypeEnum piece, int row, int column){
-        pieceTypeTable[row][column] = piece;
+    private void createPiece(PieceTypeEnum piece, int row, int column){// fredmudar procurar formas de deletar esse cara
+        int position = positionFromRowAndColumn(row,column);
+        createPieceAtPosition(position,piece);
     }
 
     private PositionData allPossibleMovements(int position){
         PositionData positionData = new PositionData();
-        for(int row=0; row<ROW_SIZE; row++){
-            for(int column=0; column<COLUMN_SIZE; column++){
-                if(position == playablePositionsTable[row][column]) {
-                    if((pieceTypeTable[row][column] == PieceTypeEnum.pieceA) ||(pieceTypeTable[row][column] == PieceTypeEnum.pieceB)){
-                        positionData.rowOfSelected = row;
-                        positionData.columnOfSelected = column;
-                        positionData.position = position;
-                        positionData.piece = pieceTypeTable[row][column];
-                        movementsForPieceX(positionData.moves, row, column);
-                        return positionData;
-                    }
-                }
-            }
-        }
+        PieceEntry pieceEntry = allBoard.get(position);
+        positionData.rowOfSelected = pieceEntry.getRow();
+        positionData.columnOfSelected = pieceEntry.getColumn();
+        positionData.position = position;
+        positionData.piece = whichPiece(position);
+
+        movementsForPieceX(positionData.moves, pieceEntry.getRow(), pieceEntry.getColumn());
         return positionData;
     }
 
     private void movementsForPieceX(ArrayList<Integer> movements, int row, int column1) {
         int nextRow;
+        int position = positionFromRowAndColumn(row,column1);
         if(reversedMovement)
-            nextRow = reversedNextPossibleRow(pieceTypeTable[row][column1], row);
+            nextRow = reversedNextPossibleRow(whichPiece(position), row);
         else
-            nextRow = nextPossibleRow(pieceTypeTable[row][column1], row);
+            nextRow = nextPossibleRow(whichPiece(position), row);
 
         if(nextRow != INVALID_NUMBER){
             addMovement(movements, nextRow, column1);
@@ -214,11 +182,12 @@ public class MovementCalculations {
     }
 
     private void addMovement(ArrayList<Integer> movements, int row, int column){
+        int position = positionFromRowAndColumn(row,column);
         if(isColumnValid(column)){
             if(columnBlock == column)
                 return;
-            if((isTypeBlank(pieceTypeTable[row][column])) || (rawPossibleMovements)){
-                movements.add(playablePositionsTable[row][column]);
+            if((isTypeBlank(whichPiece(position))) || (rawPossibleMovements)){
+                movements.add(position);
             }
         }
     }
@@ -274,6 +243,27 @@ public class MovementCalculations {
         return pieceType == PieceTypeEnum.BLANK;
     }
 
+
+
+
+
+
+    public void deletePiece(int position){
+        allBoard.get(position).setPieceType(PieceTypeEnum.BLANK);
+    }
+
+    private void createPieceAtPosition(int position, PieceTypeEnum piece){
+        allBoard.get(position).setPieceType(piece);
+    }
+
+    private int positionFromRowAndColumn(int row, int column){
+        for(int pos = 0; pos < tableSize; pos++){
+            PieceEntry pieceEntry = allBoard.get(pos);
+            if((pieceEntry.getRow() == row) && (pieceEntry.getColumn() == column))
+                return pos;
+        }
+        return INVALID_NUMBER;
+    }
 
 
 
