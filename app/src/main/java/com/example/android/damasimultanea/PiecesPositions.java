@@ -16,7 +16,7 @@ public class PiecesPositions {
     final private int COLUMN_SIZE = 4;
     private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
     private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
-    AppDatabase pieceDatabase;
+    private AppDatabase pieceDatabase;
 
     private MovementCalculations movementCalculations;
 
@@ -55,7 +55,7 @@ public class PiecesPositions {
     PiecesPositions(Context context){
         pieceDatabase = AppDatabase.getInstance(context);
         resetDatabase();
-
+        List<PieceEntry> allBoard = pieceDatabase.taskDao().loadAllPieces();
 
         playablePositionsTable[0][0] = 0;
         playablePositionsTable[0][1] = 2;
@@ -137,7 +137,7 @@ public class PiecesPositions {
         pieceTypeTable[7][2] = PieceTypeEnum.pieceB;
         pieceTypeTable[7][3] = PieceTypeEnum.pieceB;
 
-        movementCalculations = new MovementCalculations(playablePositionsTable, pieceTypeTable);
+        movementCalculations = new MovementCalculations(playablePositionsTable, pieceTypeTable, allBoard);
     }
 
 

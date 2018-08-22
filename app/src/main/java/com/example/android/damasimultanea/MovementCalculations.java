@@ -1,11 +1,18 @@
 package com.example.android.damasimultanea;
 
 import android.util.Log;
+
+import com.example.android.damasimultanea.database.PieceEntry;
+
+import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
 public class MovementCalculations {
     private int INVALID_NUMBER = -1;
+    List<PieceEntry> allBoard;
+
+
     private int ROW_SIZE;
     private int COLUMN_SIZE;
     private int tableSize;
@@ -25,7 +32,8 @@ public class MovementCalculations {
         PieceTypeEnum piece = PieceTypeEnum.NOTPLAYABLE;
     }
 
-    MovementCalculations(int[][] playablePositionsTable_in,  PieceTypeEnum[][] pieceTypeTable_in){
+    MovementCalculations(int[][] playablePositionsTable_in,  PieceTypeEnum[][] pieceTypeTable_in, List<PieceEntry> allBoard_in){
+        allBoard = allBoard_in;
         playablePositionsTable = playablePositionsTable_in;
         pieceTypeTable = pieceTypeTable_in;
         ROW_SIZE = playablePositionsTable.length;
@@ -34,6 +42,7 @@ public class MovementCalculations {
     }
 
     public PieceTypeEnum whichPiece(int position){
+        //return allBoard.get(position).getPieceType();
         for(int i=0; i<ROW_SIZE; i++){
             for(int j=0; j<COLUMN_SIZE; j++){
                 if(position == playablePositionsTable[i][j])
