@@ -18,9 +18,8 @@ import java.util.List;
 public class BoardDrawings {
 
     private TurnHandler turnHandler = new TurnHandler();
-    private PiecesPositions piecesPositions = new PiecesPositions();
-    private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
-    private AppDatabase pieceDatabase;
+    private PiecesPositions piecesPositions;
+    private MyRecyclerViewAdapter.ViewHolder[] allHolders;
 
     private TextView winPlayer;
 
@@ -37,9 +36,12 @@ public class BoardDrawings {
     private String winTie;
     private String winError;
 
-    //TODO trocar esse boarddrawing para um nome tipo game manager
+    //TODO boardrawing esta muito mesclado com turnhandler - construir um game manager que assume essa parte e separa os dois.
 
     BoardDrawings(@NotNull Context context){
+        piecesPositions = new PiecesPositions(context);
+        allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
+
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
         highlightColor = ContextCompat.getColor(context, R.color.highLight);
@@ -52,15 +54,6 @@ public class BoardDrawings {
         winRed = context.getString(R.string.win_red);
         winTie = context.getString(R.string.win_tie);
         winError = context.getString(R.string.win_error);
-
-        pieceDatabase = AppDatabase.getInstance(context);
-        ResetDatabase reset = new ResetDatabase(pieceDatabase);
-        List<PieceEntry> allPieces = pieceDatabase.taskDao().loadAllPieces();
-        Log.d("fredmudar", "database deu load corretamente");
-        for(int i = 0; i < allPieces.size(); i++){
-            Log.d("fredmudar", "pos:  " + String.valueOf(allPieces.get(i).getPosition()));
-        }
-
     }
 
     public int getTableSize(){

@@ -23,7 +23,7 @@ import com.example.android.damasimultanea.database.PieceEntry;
 
 import java.util.List;
 
-// android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
+// TODO remover android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
 public class MainActivity
         extends AppCompatActivity
         implements MyRecyclerViewAdapter.ItemClickListener{
@@ -49,7 +49,7 @@ public class MainActivity
         mRecyclerViewer = (RecyclerView) findViewById(R.id.rvNumbers);
         int numberOfColumns = 8;
         mRecyclerViewer.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
-        adapter = new MyRecyclerViewAdapter(this);
+        adapter = new MyRecyclerViewAdapter(context);
         adapter.setClickListener(this);
         mRecyclerViewer.setAdapter(adapter);
     }

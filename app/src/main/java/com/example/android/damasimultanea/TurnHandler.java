@@ -23,7 +23,7 @@ public class TurnHandler {
     private PlayerData player1 = new PlayerData();
     private PlayerData player2 = new PlayerData();
 
-    TurnHandler(){
+    public TurnHandler(){
         player1.pieceType = PieceTypeEnum.pieceA;
         player2.pieceType = PieceTypeEnum.pieceB;
     }

@@ -1,6 +1,7 @@
 package com.example.android.damasimultanea;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.android.damasimultanea.database.AppDatabase;
@@ -15,7 +16,7 @@ public class PiecesPositions {
     final private int COLUMN_SIZE = 4;
     private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
     private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
-    AppDatabase appDatabase;
+    AppDatabase pieceDatabase;
 
     private MovementCalculations movementCalculations;
 
@@ -51,7 +52,10 @@ public class PiecesPositions {
         return movementCalculations.avaliateWinningPlayer();
     }
 
-    PiecesPositions(){
+    PiecesPositions(Context context){
+        pieceDatabase = AppDatabase.getInstance(context);
+        resetDatabase();
+
 
         playablePositionsTable[0][0] = 0;
         playablePositionsTable[0][1] = 2;
@@ -138,7 +142,7 @@ public class PiecesPositions {
 
 
 
-    private void resetDatabase(AppDatabase pieceDatabase){
+    private void resetDatabase(){
         cleanDatabase(pieceDatabase);
 
         insertEntry(pieceDatabase, 0,true,PieceTypeEnum.pieceA,0,0);
