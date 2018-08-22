@@ -1,10 +1,12 @@
 package com.example.android.damasimultanea;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,20 +15,35 @@ public class BoardDrawings {
     private TurnHandler turnHandler = new TurnHandler();
     private PiecesPositions piecesPositions = new PiecesPositions();
     private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
+    private TextView winPlayer;
 
     //Colors
     private int pieceSideAColor;
     private int pieceSideBColor;
     private int highlightColor;
+    private int highlighMovementColor;
     private int backGroundPlayableColor;
     private int backGroundNotPlayableColor;
+
+    private String winBlue;
+    private String winRed;
+    private String winTie;
+    private String winError;
 
     BoardDrawings(@NotNull Context context){
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
         highlightColor = ContextCompat.getColor(context, R.color.highLight);
+        highlighMovementColor = ContextCompat.getColor(context,R.color.highLightMovement);
         backGroundPlayableColor = ContextCompat.getColor(context, R.color.colorPrimaryDark);
         backGroundNotPlayableColor = ContextCompat.getColor(context, R.color.colorAccent);
+        winPlayer = ((Activity)context).findViewById(R.id.tv_win);
+
+        winBlue = context.getString(R.string.win_blue);
+        winRed = context.getString(R.string.win_red);
+        winTie = context.getString(R.string.win_tie);
+        winError = context.getString(R.string.win_error);
+
     }
 
     public int getTableSize(){
@@ -53,24 +70,45 @@ public class BoardDrawings {
         if(turnHandler.getPlayer1Destination() == turnHandler.getPlayer2Destination()) {
             piecesPositions.deletePiece(turnHandler.getPlayer1Position());
             piecesPositions.deletePiece(turnHandler.getPlayer2Position());
-            piecesPositions.captureAllPossiblePieces();
-            turnHandler.clearAllPlayersData();
-            drawAllPieces();
-            drawAllBackground();
         }
         else {
             piecesPositions.movePiece(turnHandler.getPlayer1Position(),turnHandler.getPlayer1Destination());
             piecesPositions.movePiece(turnHandler.getPlayer2Position(),turnHandler.getPlayer2Destination());
-            piecesPositions.captureAllPossiblePieces();
-            turnHandler.clearAllPlayersData();
-            drawAllPieces();
-            drawAllBackground();
         }
+        piecesPositions.captureAllPossiblePieces();
+        turnHandler.clearAllPlayersData();
+        drawAllPieces();
+        drawAllBackground();
+    }
+
+    public void gameEndConditions(){
+        if(piecesPositions.isBothPiecesMovable())
+            return;
+
+        PieceTypeEnum winPiece = piecesPositions.avaliateWinningPlayer();
+        switch (winPiece){
+            case pieceA:
+                winPlayer.setText(winBlue);
+                break;
+
+            case pieceB:
+                winPlayer.setText(winRed);
+                break;
+
+            case BLANK:
+                winPlayer.setText(winTie);
+                break;
+
+            default:
+                winPlayer.setText(winError);
+                break;
+        }
+        winPlayer.setVisibility(View.VISIBLE);
     }
 
 
     private void setPieceMovement(int toPosition){
-        allHolders[toPosition].myTextView.setBackgroundColor(Color.GREEN);//fredmudar mudar essa definicao de cor
+        allHolders[toPosition].myTextView.setBackgroundColor(highlighMovementColor);
         turnHandler.askingToMovePiece(toPosition);
     }
 
@@ -86,7 +124,6 @@ public class BoardDrawings {
         PieceTypeEnum piece = piecesPositions.whichPiece(position);
         if(!turnHandler.isSelectionPossible(position, piece))
             return;
-        Log.d("fredmudar","position:  " + String.valueOf(position));
         turnHandler.setPossibleMovements(piecesPositions.possibleMovements(position));
         if(turnHandler.isMovementPossible()) {
             allHolders[position].myTextView.setBackgroundColor(highlightColor);

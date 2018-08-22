@@ -6,6 +6,7 @@
 
     <color name="pieceA">#2962FF</color>
     <color name="pieceB">#D50000</color>
-    <color name="highLight">#FFFF00</color>
+    <color name="highLight">#ffff00</color>
+    <color name="highLightMovement">#33691E</color>
 
 </resources>

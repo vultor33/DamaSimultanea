@@ -59,6 +59,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     public void endTurn(){
         boardDrawings.resolveAllMovements();
+        boardDrawings.gameEndConditions();
+
     }
 
     // parent activity will implement this method to respond to click events

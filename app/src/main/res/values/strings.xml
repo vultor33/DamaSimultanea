@@ -6,4 +6,9 @@
     <string name="rv_item_box_descr">DelimiterBox</string>
     <string name="rv_item_piece">Piece</string>
 
+    <string name="win_blue">BLUE PIECES WON</string>
+    <string name="win_red">RED PIECES WON</string>
+    <string name="win_tie">IT WAS A TIE</string>
+    <string name="win_error">Error, contact developers</string>
+
 </resources>

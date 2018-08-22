@@ -8,6 +8,7 @@ public class MovementCalculations {
     private int INVALID_NUMBER = -1;
     private int ROW_SIZE;
     private int COLUMN_SIZE;
+    private int tableSize;
     private int[][] playablePositionsTable;
     private PieceTypeEnum[][] pieceTypeTable;
 
@@ -29,6 +30,7 @@ public class MovementCalculations {
         pieceTypeTable = pieceTypeTable_in;
         ROW_SIZE = playablePositionsTable.length;
         COLUMN_SIZE = playablePositionsTable[0].length;
+        tableSize = (ROW_SIZE * COLUMN_SIZE * 2);
     }
 
     public PieceTypeEnum whichPiece(int position){
@@ -80,7 +82,7 @@ public class MovementCalculations {
             ArrayList< ArrayList<PositionData> > capturesPiecesMatrix,
             ArrayList<Integer> capturesOriginPieces){
 
-        for(int i = 0; i < (ROW_SIZE * COLUMN_SIZE * 2); i++){
+        for(int i = 0; i < tableSize; i++){
             ArrayList<PositionData> capturedPieces = piecesAdjacencies(i);
             if(capturedPieces.size() > 0){
                 capturesPiecesMatrix.add(capturedPieces);
@@ -119,19 +121,54 @@ public class MovementCalculations {
         }
     }
 
-    private void deletePiece(int row, int column){
-        pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
+    public boolean isBothPiecesMovable(){
+        boolean pieceAHaveMovement = false;
+        boolean pieceBHaveMoevement = false;
+        for(int i = 0; i < tableSize; i++){
+            ArrayList<Integer> moves = possibleMovements(i);
+            PieceTypeEnum piece = whichPiece(i);
+            if(moves.size() > 0) {
+                if (piece == PieceTypeEnum.pieceA)
+                    pieceAHaveMovement = true;
+                else if(piece == PieceTypeEnum.pieceB)
+                    pieceBHaveMoevement = true;
+            }
+        }
+        return pieceAHaveMovement && pieceBHaveMoevement;
     }
 
-    private void createPiece(PieceTypeEnum piece, int row, int column){
-        pieceTypeTable[row][column] = piece;
+    public PieceTypeEnum avaliateWinningPlayer(){
+        int pieceAPoints = 0;
+        int pieceBPoints = 0;
+        for(int j = 0; j < COLUMN_SIZE; j++)
+        {
+            if(pieceTypeTable[0][j] == PieceTypeEnum.pieceB)
+                pieceBPoints += 1;
+            if(pieceTypeTable[7][j] == PieceTypeEnum.pieceA)
+                pieceAPoints += 1;
+        }
+        if(pieceAPoints > pieceBPoints)
+            return PieceTypeEnum.pieceA;
+        else if(pieceAPoints < pieceBPoints)
+            return PieceTypeEnum.pieceB;
+        else
+            return PieceTypeEnum.BLANK;
     }
+
 
     public ArrayList<Integer> possibleMovements(int position) {
         reversedMovement = false;
         rawPossibleMovements = false;
         columnBlock = INVALID_NUMBER;
         return allPossibleMovements(position).moves;
+    }
+
+    private void deletePiece(int row, int column){
+        pieceTypeTable[row][column] = PieceTypeEnum.BLANK;
+    }
+
+    private void createPiece(PieceTypeEnum piece, int row, int column){
+        pieceTypeTable[row][column] = piece;
     }
 
     private PositionData allPossibleMovements(int position){

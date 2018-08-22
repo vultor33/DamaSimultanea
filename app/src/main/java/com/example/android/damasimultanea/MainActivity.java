@@ -55,7 +55,6 @@ public class MainActivity
         return true;
     }
 
-    // COMPLETED (7) Override onOptionsItemSelected to handle clicks on the refresh button
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

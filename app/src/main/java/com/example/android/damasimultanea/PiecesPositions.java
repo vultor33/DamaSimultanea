@@ -38,6 +38,14 @@ public class PiecesPositions {
         movementCalculations.deletePiece(position);
     }
 
+    public boolean isBothPiecesMovable(){
+        return movementCalculations.isBothPiecesMovable();
+    }
+
+    public PieceTypeEnum avaliateWinningPlayer(){
+        return movementCalculations.avaliateWinningPlayer();
+    }
+
     PiecesPositions(){
 
         playablePositionsTable[0][0] = 0;
