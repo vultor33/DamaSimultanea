@@ -8,13 +8,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.android.damasimultanea.database.AppDatabase;
+import com.example.android.damasimultanea.database.PieceEntry;
+
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class BoardDrawings {
 
     private TurnHandler turnHandler = new TurnHandler();
     private PiecesPositions piecesPositions = new PiecesPositions();
     private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
+    private AppDatabase pieceDatabase;
+
     private TextView winPlayer;
 
     //Colors
@@ -30,6 +37,8 @@ public class BoardDrawings {
     private String winTie;
     private String winError;
 
+    //TODO trocar esse boarddrawing para um nome tipo game manager
+
     BoardDrawings(@NotNull Context context){
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
@@ -43,6 +52,14 @@ public class BoardDrawings {
         winRed = context.getString(R.string.win_red);
         winTie = context.getString(R.string.win_tie);
         winError = context.getString(R.string.win_error);
+
+        pieceDatabase = AppDatabase.getInstance(context);
+        ResetDatabase reset = new ResetDatabase(pieceDatabase);
+        List<PieceEntry> allPieces = pieceDatabase.taskDao().loadAllPieces();
+        Log.d("fredmudar", "database deu load corretamente");
+        for(int i = 0; i < allPieces.size(); i++){
+            Log.d("fredmudar", "pos:  " + String.valueOf(allPieces.get(i).getPosition()));
+        }
 
     }
 

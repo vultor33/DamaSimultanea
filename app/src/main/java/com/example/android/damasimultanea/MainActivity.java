@@ -31,19 +31,11 @@ public class MainActivity
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
-    private AppDatabase pieceDatabase;
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setTheRecyclerViewer();
-
-        pieceDatabase = AppDatabase.getInstance(getApplicationContext());
-
     }
 
     @Override
@@ -74,23 +66,6 @@ public class MainActivity
         int id = item.getItemId();
 
         if (id == R.id.dama_menu) {
-
-            Log.d("fredmudar","criando");
-            PieceEntry pieceEntry = new PieceEntry(7,0,1,2,4);
-            Log.d("fredmudar","entry");
-
-            //pieceDatabase.taskDao().insertTask(pieceEntry);
-
-            Log.d("fredmudar", "inserted with sucess");
-
-            List<PieceEntry> allPieces = pieceDatabase.taskDao().loadAllPieces();
-
-            Log.d("fredmudar","inserted:  " + String.valueOf(allPieces.size()));
-            for(int i = 0; i < allPieces.size(); i++){
-                Log.d("fredmudar", "pos:  " + String.valueOf(allPieces.get(i).getPosition()));
-                pieceDatabase.taskDao().deletePiece(allPieces.get(i));
-            }
-
             adapter.endTurn();
             return true;
         }

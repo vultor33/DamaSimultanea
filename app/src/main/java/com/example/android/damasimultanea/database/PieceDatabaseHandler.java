@@ -11,10 +11,10 @@ public class PieceDatabaseHandler{
     }
 
     public void addPiece(){
-        PieceEntry pieceEntry = new PieceEntry(3,0,1,2,4);
+        //PieceEntry pieceEntry = new PieceEntry(3,0,1,2,4);
         Log.d("fredmudar","entry");
 
-        mDb.taskDao().insertPiece(pieceEntry);
+        //mDb.taskDao().insertPiece(pieceEntry);
 
         Log.d("fredmudar","inserted");
 

@@ -4,6 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.example.android.damasimultanea.PieceTypeEnum;
+
 @Entity(tableName = "piece")
 public class PieceEntry {
 
@@ -11,14 +13,14 @@ public class PieceEntry {
     private int id;
 
     private int position;
-    private int pieceType; //TODO - colocar o tipo estanho aqui e fazer a conversao depois - playable conversao para blue
     private int row;
     private int column;
 
-    private int isPlayable;
+    private PieceTypeEnum pieceType; //TODO - colocar o tipo estanho aqui e fazer a conversao depois - playable conversao para blue
+    private boolean isPlayable;
 
 
-    public PieceEntry(int id, int position, int isPlayable, int pieceType, int row, int column) {
+    public PieceEntry(int id, int position, boolean isPlayable, PieceTypeEnum pieceType, int row, int column) {
         this.id = id;
         this.position = position;
         this.isPlayable = isPlayable;
@@ -28,7 +30,7 @@ public class PieceEntry {
     }
 
     @Ignore
-    public PieceEntry(int position, int isPlayable, int pieceType, int row, int column) {
+    public PieceEntry(int position, boolean isPlayable, PieceTypeEnum pieceType, int row, int column) {
         this.position = position;
         this.isPlayable = isPlayable;
         this.pieceType = pieceType;
@@ -48,11 +50,11 @@ public class PieceEntry {
         return position;
     }
 
-    public int getIsPlayable() {
+    public boolean getIsPlayable() {
         return isPlayable;
     }
 
-    public int getPieceType() {
+    public PieceTypeEnum getPieceType() {
         return pieceType;
     }
 
@@ -68,11 +70,11 @@ public class PieceEntry {
         this.position = position;
     }
 
-    public void setIsPlayable(int isPlayable) {
+    public void setIsPlayable(boolean isPlayable) {
         this.isPlayable = isPlayable;
     }
 
-    public void setPieceType(int pieceType) {
+    public void setPieceType(PieceTypeEnum pieceType) {
         this.pieceType = pieceType;
     }
 
