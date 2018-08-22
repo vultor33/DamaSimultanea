@@ -2,6 +2,11 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,8 +51,6 @@ public class MainActivity
         mRecyclerViewer.setAdapter(adapter);
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -61,13 +64,12 @@ public class MainActivity
 
         if (id == R.id.dama_menu) {
             adapter.endTurn();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }
 
 
