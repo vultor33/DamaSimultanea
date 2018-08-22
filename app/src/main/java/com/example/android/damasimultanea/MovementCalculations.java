@@ -1,7 +1,5 @@
 package com.example.android.damasimultanea;
 
-import android.util.Log;
-
 import com.example.android.damasimultanea.database.PieceEntry;
 
 import java.util.List;
@@ -14,7 +12,7 @@ public class MovementCalculations {
 
     private int ROW_SIZE;
     private int COLUMN_SIZE;
-    private int tableSize;
+    private int TABLE_SIZE;
     private boolean reversedMovement;
     private boolean rawPossibleMovements;
     private int columnBlock;
@@ -32,13 +30,16 @@ public class MovementCalculations {
         allBoard = allBoard_in;
         ROW_SIZE = 8;
         COLUMN_SIZE = 4;
-        tableSize = (ROW_SIZE * COLUMN_SIZE * 2);
+        TABLE_SIZE = (ROW_SIZE * COLUMN_SIZE * 2);
     }
 
     public PieceTypeEnum whichPiece(int position){
         return allBoard.get(position).getPieceType();
     }
 
+    public int getTABLE_SIZE() {
+        return TABLE_SIZE;
+    }
 
     public void captureAllPossiblePieces(){
         while(true){
@@ -70,7 +71,7 @@ public class MovementCalculations {
             ArrayList< ArrayList<PositionData> > capturesPiecesMatrix,
             ArrayList<Integer> capturesOriginPieces){
 
-        for(int i = 0; i < tableSize; i++){
+        for(int i = 0; i < TABLE_SIZE; i++){
             ArrayList<PositionData> capturedPieces = piecesAdjacencies(i);
             if(capturedPieces.size() > 0){
                 capturesPiecesMatrix.add(capturedPieces);
@@ -102,7 +103,7 @@ public class MovementCalculations {
     public boolean isBothPiecesMovable(){
         boolean pieceAHaveMovement = false;
         boolean pieceBHaveMoevement = false;
-        for(int i = 0; i < tableSize; i++){
+        for(int i = 0; i < TABLE_SIZE; i++){
             ArrayList<Integer> moves = possibleMovements(i);
             PieceTypeEnum piece = whichPiece(i);
             if(moves.size() > 0) {
@@ -257,7 +258,7 @@ public class MovementCalculations {
     }
 
     private int positionFromRowAndColumn(int row, int column){
-        for(int pos = 0; pos < tableSize; pos++){
+        for(int pos = 0; pos < TABLE_SIZE; pos++){
             PieceEntry pieceEntry = allBoard.get(pos);
             if((pieceEntry.getRow() == row) && (pieceEntry.getColumn() == column))
                 return pos;

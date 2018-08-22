@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PiecesPositions {
-    final private int ROW_SIZE = 8;
-    final private int COLUMN_SIZE = 4;
-    private int[][] playablePositionsTable = new int[ROW_SIZE][COLUMN_SIZE];
-    private PieceTypeEnum[][] pieceTypeTable = new PieceTypeEnum[ROW_SIZE][COLUMN_SIZE];
     private AppDatabase pieceDatabase;
 
     private MovementCalculations movementCalculations;
@@ -28,7 +24,7 @@ public class PiecesPositions {
     }
 
     public int getTableSize(){
-        return ROW_SIZE * COLUMN_SIZE * 2;
+        return movementCalculations.getTABLE_SIZE();
     }
 
     public PieceTypeEnum whichPiece(int position){
@@ -39,24 +35,22 @@ public class PiecesPositions {
         return movementCalculations.possibleMovements(position);
     }
 
-    public void captureAllPossiblePieces(){
-        movementCalculations.captureAllPossiblePieces();
-    }
-
-    public void movePiece(int piecePosition, int newPiecePosition){
-        movementCalculations.movePieceXToPositionY(piecePosition,newPiecePosition);
-    }
-
-    public void deletePiece(int position){
-        movementCalculations.deletePiece(position);
-    }
-
     public boolean isBothPiecesMovable(){
         return movementCalculations.isBothPiecesMovable();
     }
-
     public PieceTypeEnum avaliateWinningPlayer(){
         return movementCalculations.avaliateWinningPlayer();
+    }
+
+    // ESSES CARAS INFLUENCIAM O BANCO DE DADOS - trabalhar com eles devagar
+    public void captureAllPossiblePieces(){
+        movementCalculations.captureAllPossiblePieces();
+    }
+    public void movePiece(int piecePosition, int newPiecePosition){
+        movementCalculations.movePieceXToPositionY(piecePosition,newPiecePosition);
+    }
+    public void deletePiece(int position){
+        movementCalculations.deletePiece(position);
     }
 
 
