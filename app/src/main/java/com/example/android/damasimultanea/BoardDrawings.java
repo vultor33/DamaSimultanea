@@ -2,18 +2,11 @@ package com.example.android.damasimultanea;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.damasimultanea.database.AppDatabase;
-import com.example.android.damasimultanea.database.PieceEntry;
-
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class BoardDrawings {
 
@@ -115,6 +108,17 @@ public class BoardDrawings {
         }
         winPlayer.setVisibility(View.VISIBLE);
     }
+
+    public void resetDatabase(){
+        piecesPositions.safeResetDatabase();
+        winPlayer.setText("");
+        drawAllBackground();
+        drawAllPieces();
+    }
+    public void saveDatabase(){
+        piecesPositions.saveDatabase();
+    }
+
 
 
     private void setPieceMovement(int toPosition){

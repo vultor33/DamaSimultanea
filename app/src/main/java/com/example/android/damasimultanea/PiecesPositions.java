@@ -1,23 +1,17 @@
 package com.example.android.damasimultanea;
 
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Looper;
-import android.util.Log;
 
 import com.example.android.damasimultanea.database.AppDatabase;
 import com.example.android.damasimultanea.database.PieceEntry;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 public class PiecesPositions {
     private AppDatabase pieceDatabase;
@@ -25,55 +19,9 @@ public class PiecesPositions {
 
 
     PiecesPositions(final Context context){
-
         pieceDatabase = AppDatabase.getInstance(context);
-        //resetDatabase();
-
-        Log.d("fredmudar","comecou pelo menos");
-
-        ExecutorService es = Executors.newSingleThreadExecutor();
-        Future<MovementCalculations> result = es.submit(new Callable<MovementCalculations>() {
-            public MovementCalculations call() throws Exception {
-                List<PieceEntry> allBoardThread = pieceDatabase.taskDao().loadAllPieces();
-                return new MovementCalculations(allBoardThread);
-            }
-        });
-        try {
-            movementCalculations = result.get();
-        } catch (Exception e) {
-            // failed
-        }
-        es.shutdown();
-
-/*
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("fredmudar","lendo banco de dados");
-                final List<PieceEntry> allBoard = pieceDatabase.taskDao().loadAllPieces();
-                Log.d("fredmudar","leu no banco de dados");
-                movementCalculations = new MovementCalculations(allBoard);
-
-                ((Activity)context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d("fredmudar","tasks");
-                        movementCalculations = new MovementCalculations(allBoard);
-
-                        //mAdapter.setTasks(tasks);
-                    }
-                });
-
-            }
-        });
-*/
-
-//        List<PieceEntry> allBoard = pieceDatabase.taskDao().loadAllPieces();
-//        movementCalculations = new MovementCalculations(allBoard);
+        movementCalculations = new MovementCalculations(loadAllDatabase());
     }
-
-
-
 
 
     public int getTableSize(){
@@ -108,7 +56,61 @@ public class PiecesPositions {
 
 
 
+    public void safeResetDatabase(){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
+        Future<Void> future = executorService.submit(new Callable<Void>() {
+            public Void call() throws Exception {
+                resetDatabase();
+                return null;
+            }
+        });
+        try {
+            future.get();
+        } catch (Exception e) {
+            // failed
+        }
+        executorService.shutdown();
+        movementCalculations.setAllBoard(loadAllDatabase());
+    }
+
+    public void saveDatabase(){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        Future<Void> future = executorService.submit(new Callable<Void>() {
+            public Void call() throws Exception {
+                List<PieceEntry> allBoard = movementCalculations.getAllBoard();
+                for(int i = 0; i < getTableSize(); i++){
+                    PieceEntry pieceEntry = allBoard.get(i);
+                    pieceDatabase.taskDao().updatePiece(pieceEntry);
+                }
+                return null;
+            }
+        });
+        try {
+            future.get();
+        } catch (Exception e) {
+            // failed
+        }
+        executorService.shutdown();
+    }
+
+    private List<PieceEntry> loadAllDatabase(){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<List<PieceEntry>> result = executorService.submit(new Callable<List<PieceEntry>>() {
+            public List<PieceEntry> call() throws Exception {
+                return pieceDatabase.taskDao().loadAllPieces();
+            }
+        });
+        List<PieceEntry> allBoard;
+        try {
+            allBoard = result.get();
+        } catch (Exception e) {
+            allBoard = null;
+        }
+        executorService.shutdown();
+        return allBoard;
+    }
 
 
 

@@ -2,6 +2,7 @@
     <string name="app_name">DamaSimultanea</string>
 
     <string name="menu_dama_play">PLAY</string>
+    <string name="menu_resetdb">RESET</string>
 
     <string name="rv_item_box_descr">DelimiterBox</string>
     <string name="rv_item_piece">Piece</string>
@@ -10,5 +11,8 @@
     <string name="win_red">RED PIECES WON</string>
     <string name="win_tie">IT WAS A TIE</string>
     <string name="win_error">Error, contact developers</string>
+
+    <string name="toast_reset">DATABASE RESETED GRACEFULLY</string>
+    <string name="toast_save">DATABASE SAVED GRACEFULLY</string>
 
 </resources>

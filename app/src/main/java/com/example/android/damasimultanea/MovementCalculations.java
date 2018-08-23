@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.example.android.damasimultanea.database.PieceEntry;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
@@ -29,12 +31,18 @@ public class MovementCalculations {
     }
 
     MovementCalculations(List<PieceEntry> allBoard_in){
-        if(allBoard_in == null)
-            Log.d("fredmudar", "null no movement calculations");
         allBoard = allBoard_in;
         ROW_SIZE = 8;
         COLUMN_SIZE = 4;
         TABLE_SIZE = (ROW_SIZE * COLUMN_SIZE * 2);
+    }
+
+    public List<PieceEntry> getAllBoard(){
+        return allBoard;
+    }
+
+    public void setAllBoard(List<PieceEntry> allBoard_in){
+        allBoard = allBoard_in;
     }
 
     public PieceTypeEnum whichPiece(int position){

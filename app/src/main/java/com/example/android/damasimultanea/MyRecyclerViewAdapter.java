@@ -23,26 +23,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private BoardDrawings boardDrawings;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private List<PieceEntry> allBoardDb;
 
     MyRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         boardDrawings = new BoardDrawings(context);
     }
-
-
-    public void setAllBoardDb(List<PieceEntry> allBoardDb_in){
-        if(allBoardDb_in == null)
-            Log.d("fredmudar", "nao conseguiu ler no banco de dados");
-        allBoardDb = allBoardDb_in;
-    }
-
-    public int getBoardPos(int pos){
-        if(allBoardDb == null)
-            Log.d("fredmudar", "e null essa joca");
-        return allBoardDb.get(pos).getPosition();
-    }
-
 
     @NonNull
     @Override
@@ -61,31 +46,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return boardDrawings.getTableSize(); //cell count
     }
 
-    // convenience method for getting data at click position
-    String getItem(int id) {
-        return String.valueOf(id);
-    }
-
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    public void playPiece(int position){
-        boardDrawings.playPiece(position);
-    }
-
-    public void endTurn(){
-        boardDrawings.resolveAllMovements();
-        boardDrawings.gameEndConditions();
-
-    }
-
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
-    }
-
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView myTextView;
         public ImageView pieceImage;
@@ -102,6 +62,44 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             if (mClickListener != null)
                 mClickListener.onItemClick(view, getAdapterPosition());
         }
+    }
+
+
+
+
+
+    //CLICK OPTIONS
+    String getItem(int id) {
+        return String.valueOf(id);
+    }
+    void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+
+
+
+
+
+    //GAME OPTIONS
+    public void playPiece(int position){
+        boardDrawings.playPiece(position);
+    }
+    public void endTurn(){
+        boardDrawings.resolveAllMovements();
+        boardDrawings.gameEndConditions();
+
+    }
+    public void saveDatabase(){
+        boardDrawings.saveDatabase();
+    }
+
+    public void resetDatabase(){
+        boardDrawings.resetDatabase();
     }
 
 

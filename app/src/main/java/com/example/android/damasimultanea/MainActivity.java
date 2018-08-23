@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.damasimultanea.database.AppDatabase;
 import com.example.android.damasimultanea.database.PieceEntry;
@@ -33,31 +34,11 @@ public class MainActivity
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
-    AppDatabase pieceDatabase;
-    List<PieceEntry> allBoardDb;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTheRecyclerViewer();
-
-        pieceDatabase = AppDatabase.getInstance(getApplicationContext());
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                final List<PieceEntry> allBoard = pieceDatabase.taskDao().loadAllPieces();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //allBoardDb = allBoard;
-                        adapter.setAllBoardDb(allBoard);//TODO remover essas coisas no main thread
-                    }
-                });
-            }
-        });
-
 
 
     }
@@ -86,15 +67,30 @@ public class MainActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
+        super.onStop();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.dama_menu) {
             adapter.endTurn();
-
-            Log.d("fredmudar", "uma pos:  " + String.valueOf(adapter.getBoardPos(4)));
-
-
+            return true;
+        } else if (id == R.id.menu_resetdb) {
+            adapter.resetDatabase();
+            Toast.makeText(
+                    this,
+                    getString(R.string.toast_reset),
+                    Toast.LENGTH_LONG)
+                    .show();
 
             return true;
         }
