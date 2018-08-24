@@ -30,6 +30,9 @@ public class PieceEntry {
     }
 
     @Ignore
+    public PieceEntry() {}
+
+    @Ignore
     public PieceEntry(int position, boolean isPlayable, PieceTypeEnum pieceType, int row, int column) {
         this.position = position;
         this.isPlayable = isPlayable;
