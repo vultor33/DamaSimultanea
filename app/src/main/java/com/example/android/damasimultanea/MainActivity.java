@@ -1,6 +1,7 @@
 package com.example.android.damasimultanea;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.android.damasimultanea.database.FirebaseDatabaseHandler;
 import com.example.android.damasimultanea.database.PieceEntry;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,12 +42,12 @@ public class MainActivity
 
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
+
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mMessagesDatabaseReference;
-    private ChildEventListener mChildEventListener;
-    private String mUsername;
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+    FirebaseDatabaseHandler mFirebaseDatabaseHandler;
+    AuthenticationHandler mAuthentication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,129 +56,38 @@ public class MainActivity
         setTheRecyclerViewer();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(mFirebaseDatabase);
+
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
-        mUsername = ANONYMUS;
-        PieceEntry pieceEntry = new PieceEntry(4,true, PieceTypeEnum.pieceB,3,4);
-        mMessagesDatabaseReference.push().setValue(pieceEntry);
+        mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
 
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user != null){
-                    onSignedInInitialize(user.getDisplayName());
-                    Toast.makeText(
-                            MainActivity.this,
-                            "Signer in, Welcome",
-                            Toast.LENGTH_SHORT).show();
-
-                }else{
-                    onSignedOutCleanup();
-                    List<AuthUI.IdpConfig> providers = Arrays.asList(
-                            new AuthUI.IdpConfig.EmailBuilder().build());
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(providers)
-                                    .build(),
-                            RC_SIGN_IN);
-                }
-            }
-        };
     }
 
-
-
-
-    ////////////////////////////  FIREBASE  ///////////////////////////////////////////////////////////
-    private void atachDatabaseReadListener(){
-        if(mChildEventListener == null) {
-            mChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    PieceEntry pieceEntry = dataSnapshot.getValue(PieceEntry.class);
-                    Log.d("fredmudar", "imprimindo:  " + pieceEntry.getPieceType());
-                    if(pieceEntry.getPieceType() == PieceTypeEnum.pieceB)
-                        Log.d("fredmudar","para a noooossaaaa alegriaaaaa");
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
-            };
-            mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
-        }
-    }
-
-    private void detachDatabaseReadListener() {
-        if(mChildEventListener != null) {
-            mMessagesDatabaseReference.removeEventListener(mChildEventListener);
-            mChildEventListener = null;
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_CANCELED))
+            finish();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(mAuthStateListener != null){
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-        }
-        detachDatabaseReadListener();
+        mAuthentication.removeListener();
+        mFirebaseDatabaseHandler.detachDatabaseReadListener();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        atachDatabaseReadListener();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        mAuthentication.addListener();
+        mFirebaseDatabaseHandler.atachDatabaseReadListener();
     }
-
-    private void onSignedInInitialize(String username){
-        mUsername = username;
-        atachDatabaseReadListener();
-    }
-
-    private void onSignedOutCleanup(){
-        mUsername = ANONYMUS;
-        detachDatabaseReadListener();
-    }
-
-    ////////////////////////////  FIREBASE  ///////////////////////////////////////////////////////////
-
-
-
-
-
 
     @Override
     public void onItemClick(View view, int position) {
         Log.d("fredmudar", "CLICKED POSITION: " + String.valueOf(position));
         adapter.playPiece(position);
-    }
-
-    void setTheRecyclerViewer(){
-        Context context = this;
-        mRecyclerViewer = (RecyclerView) findViewById(R.id.rvNumbers);
-        int numberOfColumns = 8;
-        mRecyclerViewer.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
-        adapter = new MyRecyclerViewAdapter(context);
-        adapter.setClickListener(this);
-        mRecyclerViewer.setAdapter(adapter);
     }
 
     @Override
@@ -193,8 +104,8 @@ public class MainActivity
 
     @Override
     protected void onStop() {
-        adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
         super.onStop();
+        adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
     }
 
     @Override
@@ -213,10 +124,27 @@ public class MainActivity
                     .show();
 
             return true;
+        } else if (id == R.id.menu_signout){
+            mAuthentication.logOut();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    void setTheRecyclerViewer(){
+        Context context = this;
+        mRecyclerViewer = (RecyclerView) findViewById(R.id.rvNumbers);
+        int numberOfColumns = 8;
+        mRecyclerViewer.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        adapter = new MyRecyclerViewAdapter(context);
+        adapter.setClickListener(this);
+        mRecyclerViewer.setAdapter(adapter);
+    }
+
+
+
+
 }
 
 
