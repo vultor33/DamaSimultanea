@@ -37,9 +37,6 @@ public class MainActivity
         extends AppCompatActivity
         implements MyRecyclerViewAdapter.ItemClickListener{
 
-    private final String ANONYMUS = "anonymus";
-    private final int RC_SIGN_IN = 1;
-
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
@@ -87,6 +84,7 @@ public class MainActivity
     @Override
     public void onItemClick(View view, int position) {
         Log.d("fredmudar", "CLICKED POSITION: " + String.valueOf(position));
+        Log.d("fredmudar", "quantidade ja carregada:  " + String.valueOf(mFirebaseDatabaseHandler.getPiecesSize()));
         adapter.playPiece(position);
     }
 

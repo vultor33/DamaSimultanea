@@ -3,6 +3,7 @@ package com.example.android.damasimultanea;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -25,8 +26,8 @@ public class AuthenticationHandler {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     public AuthenticationHandler(final Context context_in, FirebaseAuth mFirebaseAuth_in) {
-        mFirebaseAuth = mFirebaseAuth_in;
         context = context_in;
+        mFirebaseAuth = mFirebaseAuth_in;
         mAuthStateListener = new CreateFirebaseAuthListener();
     }
 

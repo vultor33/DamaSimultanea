@@ -11,20 +11,34 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class FirebaseDatabaseHandler {
 
     final private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    ArrayList<PieceEntry> allPieces = new ArrayList<>();
+
+
+
+
     public FirebaseDatabaseHandler(
             FirebaseDatabase mFirebaseDatabase_in)
     {
-        mMessagesDatabaseReference = mFirebaseDatabase_in.getReference().child("messages");
+        mMessagesDatabaseReference = mFirebaseDatabase_in.getReference().child("BOARD"); //read and write on BOARD flag
         mChildEventListener = null;
 
-        PieceEntry pieceEntry = new PieceEntry(4,true, PieceTypeEnum.pieceB,3,4);
+        PieceEntry pieceEntry = new PieceEntry(1,4,true, PieceTypeEnum.pieceB,3,4);
         mMessagesDatabaseReference.push().setValue(pieceEntry);
+
+
+    }
+
+    public int getPiecesSize(){
+        return allPieces.size();
     }
 
     public void atachDatabaseReadListener(){
@@ -42,6 +56,8 @@ public class FirebaseDatabaseHandler {
     }
 
 
+
+
     private class ChildEventListenerPieces implements ChildEventListener {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -49,6 +65,8 @@ public class FirebaseDatabaseHandler {
             Log.d("fredmudar", "imprimindo:  " + pieceEntry.getPieceType());
             if(pieceEntry.getPieceType() == PieceTypeEnum.pieceB)
                 Log.d("fredmudar","para a noooossaaaa alegriaaaaa");
+
+            allPieces.add(pieceEntry);
         }
 
         @Override
