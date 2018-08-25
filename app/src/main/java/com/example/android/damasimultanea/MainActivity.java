@@ -156,16 +156,6 @@ public class MainActivity
         detachDatabaseReadListener();
     }
 
-
-
-
-
-
-
-
-
-
-
     ////////////////////////////  FIREBASE  ///////////////////////////////////////////////////////////
 
 
