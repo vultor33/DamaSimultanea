@@ -15,5 +15,6 @@
 
     <string name="toast_reset">DATABASE RESETED GRACEFULLY</string>
     <string name="toast_save">DATABASE SAVED GRACEFULLY</string>
+    <string name="toast_database_wait">LOADING DATABASE, JUST GIVE US A SECOND #</string>
 
 </resources>

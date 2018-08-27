@@ -2,6 +2,7 @@ package com.example.android.damasimultanea;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +26,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +49,8 @@ public class MainActivity
     FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     AuthenticationHandler mAuthentication;
 
+    List<PieceEntry> list = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +62,6 @@ public class MainActivity
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
-
     }
 
     @Override
@@ -83,9 +87,18 @@ public class MainActivity
 
     @Override
     public void onItemClick(View view, int position) {
+        if(!mFirebaseDatabaseHandler.isDatabaseLoaded()) {
+            Toast.makeText(
+                    this,
+                    R.string.toast_database_wait,
+                    Toast.LENGTH_LONG)
+                    .show();
+            return;
+        }
+
         Log.d("fredmudar", "CLICKED POSITION: " + String.valueOf(position));
-        Log.d("fredmudar", "quantidade ja carregada:  " + String.valueOf(mFirebaseDatabaseHandler.getPiecesSize()));
-        adapter.playPiece(position);
+        if(mFirebaseDatabaseHandler.isDatabaseLoaded())//adicionar um toast aqui
+            adapter.playPiece(position);
     }
 
     @Override
@@ -108,8 +121,16 @@ public class MainActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        if(!mFirebaseDatabaseHandler.isDatabaseLoaded()) {
+            Toast.makeText(
+                    this,
+                    R.string.toast_database_wait,
+                    Toast.LENGTH_LONG)
+                    .show();
+            return super.onOptionsItemSelected(item);
+        }
 
+        int id = item.getItemId();
         if (id == R.id.dama_menu) {
             adapter.endTurn();
             return true;
@@ -126,7 +147,6 @@ public class MainActivity
             mAuthentication.logOut();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -139,8 +159,6 @@ public class MainActivity
         adapter.setClickListener(this);
         mRecyclerViewer.setAdapter(adapter);
     }
-
-
 
 
 }

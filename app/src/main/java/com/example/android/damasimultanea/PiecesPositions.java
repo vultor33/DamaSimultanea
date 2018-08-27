@@ -4,7 +4,9 @@ package com.example.android.damasimultanea;
 import android.content.Context;
 
 import com.example.android.damasimultanea.database.AppDatabase;
+import com.example.android.damasimultanea.database.FirebaseDatabaseHandler;
 import com.example.android.damasimultanea.database.PieceEntry;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,18 +15,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+
 public class PiecesPositions {
     private AppDatabase pieceDatabase;
     private MovementCalculations movementCalculations;
 
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseDatabaseHandler mFirebaseDatabaseHandler;
 
     PiecesPositions(final Context context){
         pieceDatabase = AppDatabase.getInstance(context);
         movementCalculations = new MovementCalculations(loadAllDatabase());
 
-
-
-        
     }
 
 
