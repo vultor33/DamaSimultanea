@@ -20,10 +20,7 @@ public class FirebaseDatabaseHandler {
     final private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
 
-    ArrayList<PieceEntry> allPieces = new ArrayList<>();
-
-
-
+    private ArrayList<PieceEntry> allPieces = new ArrayList<>();
 
     public FirebaseDatabaseHandler(
             FirebaseDatabase mFirebaseDatabase_in)
@@ -33,7 +30,6 @@ public class FirebaseDatabaseHandler {
 
         PieceEntry pieceEntry = new PieceEntry(1,4,true, PieceTypeEnum.pieceB,3,4);
         mMessagesDatabaseReference.push().setValue(pieceEntry);
-
 
     }
 

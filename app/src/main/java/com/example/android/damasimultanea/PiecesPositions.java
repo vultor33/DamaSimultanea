@@ -21,6 +21,10 @@ public class PiecesPositions {
     PiecesPositions(final Context context){
         pieceDatabase = AppDatabase.getInstance(context);
         movementCalculations = new MovementCalculations(loadAllDatabase());
+
+
+
+        
     }
 
 
