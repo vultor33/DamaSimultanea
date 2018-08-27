@@ -13,7 +13,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FirebaseDatabaseHandler {
 
@@ -24,6 +23,7 @@ public class FirebaseDatabaseHandler {
     private ValueEventListener valueEventListener;
 
     private ArrayList<PieceEntry> allPieces = new ArrayList<>();
+    private ArrayList<String> allKeys = new ArrayList<>();
 
     public FirebaseDatabaseHandler(FirebaseDatabase mFirebaseDatabase_in)
     {
@@ -78,6 +78,7 @@ public class FirebaseDatabaseHandler {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    allKeys.add(ds.getKey());
                     PieceEntry piece = ds.getValue(PieceEntry.class);
                     allPieces.add(piece);
                 }
@@ -162,6 +163,7 @@ public class FirebaseDatabaseHandler {
         insertEntry(63,true,PieceTypeEnum.pieceB,7,3);
 
     }
+
     private void insertEntry(
                              int position,
                              boolean isPlayable,

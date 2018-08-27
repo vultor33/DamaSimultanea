@@ -49,8 +49,6 @@ public class MainActivity
     FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     AuthenticationHandler mAuthentication;
 
-    List<PieceEntry> list = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
