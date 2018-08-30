@@ -5,9 +5,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/dama_menu"
+        android:id="@+id/menu_play"
         android:orderInCategory="1"
-        android:title="@string/menu_dama_play"
+        android:title="@string/menu_dama_wait"
         app:showAsAction="ifRoom" />
 
     <item

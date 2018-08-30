@@ -2,6 +2,7 @@
     <string name="app_name">DamaSimultanea</string>
 
     <string name="menu_dama_play">PLAY</string>
+    <string name="menu_dama_wait">WAIT</string>
     <string name="menu_resetdb">RESET</string>
     <string name="menu_signout">SIGN OUT</string>
 
@@ -15,7 +16,7 @@
 
     <string name="toast_reset">DATABASE RESETED GRACEFULLY</string>
     <string name="toast_save">DATABASE SAVED GRACEFULLY</string>
-    <string name="toast_database_wait">LOADING DATABASE, JUST GIVE US A SECOND #</string>
+    <string name="toast_database_wait">WAIT YOUR OPONENT\'S MOVE</string>
 
     <string name="firebase_board">BOARD</string>
     <string name="firebase_game">GAME</string>

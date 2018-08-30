@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.example.android.damasimultanea.PieceTypeEnum;
 import com.example.android.damasimultanea.R;
@@ -20,13 +21,18 @@ public class FirebaseDatabaseHandler {
 
     private int BOARD_SIZE = 64;
     final private String serverOwner;
+    final private String gameKey = "-LLAb5CMF-eGkalyFFZS";
+    final private String menuPlay;
+    final private String menuWait;
+    private MenuItem menuplayItem;
 
-    final private DatabaseReference mMessagesDatabaseReference;
-    final private DatabaseReference mGameHandlerDatabase;
+    final private DatabaseReference mPieceEntryReference;
+    final private DatabaseReference mGameHandlerReference;
     private ChildEventListener mChildEventListenerPieces;
     private ChildEventListener mChildEventListenerGame;
     private ValueEventListener valueEventListener;
 
+    private GameHandler gameHandler;
     private ArrayList<PieceEntry> allPieces = new ArrayList<>();
     private ArrayList<String> allKeys = new ArrayList<>();
 
@@ -39,31 +45,70 @@ public class FirebaseDatabaseHandler {
         serverOwner = context.getString(R.string.firebase_server_owner);
         String boardReference = context.getString(R.string.firebase_board);
         String gameReference = context.getString(R.string.firebase_game);
-        mMessagesDatabaseReference = mFirebaseDatabase_in.getReference().child(boardReference); //read and write on BOARD flag
-        mGameHandlerDatabase = mFirebaseDatabase_in.getReference().child(gameReference);
+        menuPlay = context.getString(R.string.menu_dama_play);
+        menuWait = context.getString(R.string.menu_dama_wait);
 
+        mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference); //read and write on BOARD flag
+        mGameHandlerReference = mFirebaseDatabase_in.getReference().child(gameReference);
         mChildEventListenerPieces = null;
         mChildEventListenerGame = null;
         valueEventListener = null;
+        menuplayItem = null;
 
-        // TODO BUTTON TO RESET DATABASE
         readAllDatabase();
-        //createFireDatabase();
+        //createFireDatabase();// TODO -- BUTTON TO RESET DATABASE
     }
 
-    public boolean isDatabaseLoaded(){
+    public boolean isReady(){
+        return isDatabaseLoaded() && isPlayable();
+    }
+
+    public void setMenuItem(MenuItem menuplayItem_in){
+        menuplayItem = menuplayItem_in;
+        setMenuPlayTitle();
+    }
+
+
+    public void updateGameStatus(GameHandler gameChanges){
+        mGameHandlerReference.child(gameKey).setValue(gameChanges);
+    }
+
+    public void updatePiecePosition(int position, PieceEntry pieceEntry){
+        mPieceEntryReference
+                .child(allKeys.get(position))
+                .setValue(pieceEntry);
+    }
+
+    private void savePieceChange(PieceEntry pieceEntry){
+        allPieces.set(pieceEntry.getPosition(), pieceEntry);
+    }
+
+    private boolean isPlayable(){
+        return gameHandler.isPlayable();
+    }
+
+    private boolean isDatabaseLoaded(){
         return allPieces.size() == BOARD_SIZE;
+    }
+
+    private void setMenuPlayTitle(){
+        if(menuplayItem != null) {
+            if (isReady())
+                menuplayItem.setTitle(menuPlay);
+            else
+                menuplayItem.setTitle(menuWait);
+        }
     }
 
     public void atachDatabaseReadListener(){
         if(isDatabaseLoaded()){
             if (mChildEventListenerPieces == null) {
                 mChildEventListenerPieces = new ChildEventListenerPieces();
-                mMessagesDatabaseReference.addChildEventListener(mChildEventListenerPieces);
+                mPieceEntryReference.addChildEventListener(mChildEventListenerPieces);
             }
             if (mChildEventListenerGame == null) {
                 mChildEventListenerGame = new ChildEventListenerGame();
-                mGameHandlerDatabase.addChildEventListener(mChildEventListenerGame);
+                mGameHandlerReference.addChildEventListener(mChildEventListenerGame);
             }
 
         } else {
@@ -75,15 +120,15 @@ public class FirebaseDatabaseHandler {
 
     public void detachDatabaseReadListener() {
         if(valueEventListener != null){
-            mMessagesDatabaseReference.removeEventListener(valueEventListener);
+            mPieceEntryReference.removeEventListener(valueEventListener);
             valueEventListener = null;
         }
         if(mChildEventListenerPieces != null){
-            mMessagesDatabaseReference.removeEventListener(mChildEventListenerPieces);
+            mPieceEntryReference.removeEventListener(mChildEventListenerPieces);
             mChildEventListenerPieces = null;
         }
         if(mChildEventListenerGame != null){
-            mGameHandlerDatabase.removeEventListener(mChildEventListenerGame);
+            mGameHandlerReference.removeEventListener(mChildEventListenerGame);
             mChildEventListenerGame= null;
         }
 
@@ -97,6 +142,7 @@ public class FirebaseDatabaseHandler {
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             PieceEntry piece = dataSnapshot.getValue(PieceEntry.class);
+            savePieceChange(piece);
             Log.d("fredmudar", "data changed:  " + String.valueOf(piece.getPosition()));
         }
 
@@ -116,11 +162,16 @@ public class FirebaseDatabaseHandler {
     class ChildEventListenerGame implements ChildEventListener {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            GameHandler game = dataSnapshot.getValue(GameHandler.class);
+            gameHandler = game;
+            setMenuPlayTitle();
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             GameHandler game = dataSnapshot.getValue(GameHandler.class);
+            gameHandler = game;
+            setMenuPlayTitle();
             Log.d("fredmudar", "data changed:  " + String.valueOf(game.getServer()));
         }
 
@@ -152,7 +203,7 @@ public class FirebaseDatabaseHandler {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        mMessagesDatabaseReference.addListenerForSingleValueEvent(valueEventListener);
+        mPieceEntryReference.addListenerForSingleValueEvent(valueEventListener);
     }
 
     private void createFireDatabase(){
@@ -229,7 +280,7 @@ public class FirebaseDatabaseHandler {
         insertEntry(63,true,PieceTypeEnum.pieceB,7,3);
 
         GameHandler gameHandler = new GameHandler(serverOwner,-1,-1,-1,-1,true);
-        mGameHandlerDatabase.push().setValue(gameHandler);
+        mGameHandlerReference.push().setValue(gameHandler);
 
     }
 
@@ -240,7 +291,7 @@ public class FirebaseDatabaseHandler {
                              int row,
                              int column){
         PieceEntry pieceEntry = new PieceEntry(position, position,isPlayable, pieceType,row,column);
-        mMessagesDatabaseReference.push().setValue(pieceEntry);
+        mPieceEntryReference.push().setValue(pieceEntry);
     }
 
 

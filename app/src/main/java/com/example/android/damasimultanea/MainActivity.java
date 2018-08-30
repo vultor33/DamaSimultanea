@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -49,6 +50,8 @@ public class MainActivity
     FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     AuthenticationHandler mAuthentication;
 
+    MenuItem playButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,7 @@ public class MainActivity
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
+
     }
 
     @Override
@@ -67,6 +71,9 @@ public class MainActivity
         super.onActivityResult(requestCode, resultCode, data);
         if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_CANCELED))
             finish();
+        else if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_OK)){
+            //GameController -- start here TODO
+        }
     }
 
     @Override
@@ -85,7 +92,7 @@ public class MainActivity
 
     @Override
     public void onItemClick(View view, int position) {
-        if(!mFirebaseDatabaseHandler.isDatabaseLoaded()) {
+        if(!mFirebaseDatabaseHandler.isReady()) {
             Toast.makeText(
                     this,
                     R.string.toast_database_wait,
@@ -93,16 +100,14 @@ public class MainActivity
                     .show();
             return;
         }
-
-        Log.d("fredmudar", "CLICKED POSITION: " + String.valueOf(position));
-        if(mFirebaseDatabaseHandler.isDatabaseLoaded())//adicionar um toast aqui
-            adapter.playPiece(position);
+        adapter.playPiece(position);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.dama_menu, menu);
+        mFirebaseDatabaseHandler.setMenuItem(menu.findItem(R.id.menu_play));
         return true;
     }
 
@@ -119,7 +124,7 @@ public class MainActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(!mFirebaseDatabaseHandler.isDatabaseLoaded()) {
+        if(!mFirebaseDatabaseHandler.isReady()) {
             Toast.makeText(
                     this,
                     R.string.toast_database_wait,
@@ -129,7 +134,7 @@ public class MainActivity
         }
 
         int id = item.getItemId();
-        if (id == R.id.dama_menu) {
+        if (id == R.id.menu_play) {
             adapter.endTurn();
             return true;
         } else if (id == R.id.menu_resetdb) {
