@@ -43,8 +43,8 @@ public class MainActivity
     RecyclerView mRecyclerViewer;
     MyRecyclerViewAdapter adapter;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseAuth mFirebaseAuth;
+    FirebaseDatabase mFirebaseDatabase;
+    FirebaseAuth mFirebaseAuth;
 
     FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     AuthenticationHandler mAuthentication;
@@ -56,7 +56,7 @@ public class MainActivity
         setTheRecyclerViewer();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(mFirebaseDatabase);
+        mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(this, mFirebaseDatabase);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);

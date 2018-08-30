@@ -1,10 +1,12 @@
 package com.example.android.damasimultanea.database;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.android.damasimultanea.PieceTypeEnum;
+import com.example.android.damasimultanea.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,20 +19,36 @@ import java.util.ArrayList;
 public class FirebaseDatabaseHandler {
 
     private int BOARD_SIZE = 64;
+    final private String serverOwner;
 
     final private DatabaseReference mMessagesDatabaseReference;
-    private ChildEventListener mChildEventListener;
+    final private DatabaseReference mGameHandlerDatabase;
+    private ChildEventListener mChildEventListenerPieces;
+    private ChildEventListener mChildEventListenerGame;
     private ValueEventListener valueEventListener;
 
     private ArrayList<PieceEntry> allPieces = new ArrayList<>();
     private ArrayList<String> allKeys = new ArrayList<>();
 
-    public FirebaseDatabaseHandler(FirebaseDatabase mFirebaseDatabase_in)
-    {
-        mMessagesDatabaseReference = mFirebaseDatabase_in.getReference().child("BOARD"); //read and write on BOARD flag
-        mChildEventListener = null;
+    // se play1 e play2 movimentaram as pecas. o Server vai puxar tudo.
+    // executar o movimento dar upload no banco de dados e, por fim,
+    // setar o isPlayable pra true
 
+    public FirebaseDatabaseHandler(Context context, FirebaseDatabase mFirebaseDatabase_in)
+    {
+        serverOwner = context.getString(R.string.firebase_server_owner);
+        String boardReference = context.getString(R.string.firebase_board);
+        String gameReference = context.getString(R.string.firebase_game);
+        mMessagesDatabaseReference = mFirebaseDatabase_in.getReference().child(boardReference); //read and write on BOARD flag
+        mGameHandlerDatabase = mFirebaseDatabase_in.getReference().child(gameReference);
+
+        mChildEventListenerPieces = null;
+        mChildEventListenerGame = null;
+        valueEventListener = null;
+
+        // TODO BUTTON TO RESET DATABASE
         readAllDatabase();
+        //createFireDatabase();
     }
 
     public boolean isDatabaseLoaded(){
@@ -38,8 +56,20 @@ public class FirebaseDatabaseHandler {
     }
 
     public void atachDatabaseReadListener(){
-        if(valueEventListener == null) {
-            readAllDatabase();
+        if(isDatabaseLoaded()){
+            if (mChildEventListenerPieces == null) {
+                mChildEventListenerPieces = new ChildEventListenerPieces();
+                mMessagesDatabaseReference.addChildEventListener(mChildEventListenerPieces);
+            }
+            if (mChildEventListenerGame == null) {
+                mChildEventListenerGame = new ChildEventListenerGame();
+                mGameHandlerDatabase.addChildEventListener(mChildEventListenerGame);
+            }
+
+        } else {
+            if (valueEventListener == null) {
+                readAllDatabase();
+            }
         }
     }
 
@@ -48,15 +78,50 @@ public class FirebaseDatabaseHandler {
             mMessagesDatabaseReference.removeEventListener(valueEventListener);
             valueEventListener = null;
         }
+        if(mChildEventListenerPieces != null){
+            mMessagesDatabaseReference.removeEventListener(mChildEventListenerPieces);
+            mChildEventListenerPieces = null;
+        }
+        if(mChildEventListenerGame != null){
+            mGameHandlerDatabase.removeEventListener(mChildEventListenerGame);
+            mChildEventListenerGame= null;
+        }
+
     }
 
-    private class ChildEventListenerPieces implements ChildEventListener {
+    class ChildEventListenerPieces implements ChildEventListener {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            PieceEntry piece = dataSnapshot.getValue(PieceEntry.class);
+            Log.d("fredmudar", "data changed:  " + String.valueOf(piece.getPosition()));
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+        }
+    }
+
+    class ChildEventListenerGame implements ChildEventListener {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            GameHandler game = dataSnapshot.getValue(GameHandler.class);
+            Log.d("fredmudar", "data changed:  " + String.valueOf(game.getServer()));
         }
 
         @Override
@@ -82,6 +147,7 @@ public class FirebaseDatabaseHandler {
                     PieceEntry piece = ds.getValue(PieceEntry.class);
                     allPieces.add(piece);
                 }
+                atachDatabaseReadListener();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -161,6 +227,9 @@ public class FirebaseDatabaseHandler {
         insertEntry(61,true,PieceTypeEnum.pieceB,7,2);
         insertEntry(62,false,PieceTypeEnum.NOTPLAYABLE,-1,-1);
         insertEntry(63,true,PieceTypeEnum.pieceB,7,3);
+
+        GameHandler gameHandler = new GameHandler(serverOwner,-1,-1,-1,-1,true);
+        mGameHandlerDatabase.push().setValue(gameHandler);
 
     }
 

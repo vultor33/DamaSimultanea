@@ -17,4 +17,9 @@
     <string name="toast_save">DATABASE SAVED GRACEFULLY</string>
     <string name="toast_database_wait">LOADING DATABASE, JUST GIVE US A SECOND #</string>
 
+    <string name="firebase_board">BOARD</string>
+    <string name="firebase_game">GAME</string>
+    <string name="firebase_server_owner">vultor</string>
+
+
 </resources>

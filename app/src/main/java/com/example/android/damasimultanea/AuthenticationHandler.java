@@ -58,12 +58,14 @@ public class AuthenticationHandler {
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user != null) {
+                mUsername = user.getDisplayName();
                 Toast.makeText(
                         context,
-                        "Signer in, Welcome",
+                        mUsername +", welcome",
                         Toast.LENGTH_SHORT).show();
 
             } else {
+                mUsername = null;
                 List<AuthUI.IdpConfig> providers = Arrays.asList(
                         new AuthUI.IdpConfig.EmailBuilder().build());
                 ((Activity) context).startActivityForResult(
