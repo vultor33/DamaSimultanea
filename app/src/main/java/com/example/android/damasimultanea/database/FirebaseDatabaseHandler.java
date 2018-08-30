@@ -68,7 +68,6 @@ public class FirebaseDatabaseHandler {
         setMenuPlayTitle();
     }
 
-
     public void updateGameStatus(GameHandler gameChanges){
         mGameHandlerReference.child(gameKey).setValue(gameChanges);
     }
