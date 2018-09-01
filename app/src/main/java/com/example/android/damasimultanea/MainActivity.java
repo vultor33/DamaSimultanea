@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.android.damasimultanea.database.FirebaseDatabaseHandler;
+import com.example.android.damasimultanea.database.GameController;
 import com.example.android.damasimultanea.database.PieceEntry;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,7 +48,8 @@ public class MainActivity
     FirebaseDatabase mFirebaseDatabase;
     FirebaseAuth mFirebaseAuth;
 
-    FirebaseDatabaseHandler mFirebaseDatabaseHandler;
+    //FirebaseDatabaseHandler mFirebaseDatabaseHandler;
+    GameController gameController;
     AuthenticationHandler mAuthentication;
 
     MenuItem playButton;
@@ -59,7 +61,8 @@ public class MainActivity
         setTheRecyclerViewer();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(this, mFirebaseDatabase);
+        //mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(this, mFirebaseDatabase);
+        gameController = new GameController(this,mFirebaseDatabase);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
@@ -80,19 +83,22 @@ public class MainActivity
     protected void onPause() {
         super.onPause();
         mAuthentication.removeListener();
-        mFirebaseDatabaseHandler.detachDatabaseReadListener();
+        gameController.detachDatabaseReadListener();
+        //mFirebaseDatabaseHandler.detachDatabaseReadListener();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mAuthentication.addListener();
-        mFirebaseDatabaseHandler.atachDatabaseReadListener();
+        gameController.atachDatabaseReadListener();
+        //mFirebaseDatabaseHandler.atachDatabaseReadListener();
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        if(!mFirebaseDatabaseHandler.isReady()) {
+        //if(!mFirebaseDatabaseHandler.isReady()) {
+        if(!gameController.isNotReady()) {
             Toast.makeText(
                     this,
                     R.string.toast_database_wait,
@@ -107,7 +113,8 @@ public class MainActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.dama_menu, menu);
-        mFirebaseDatabaseHandler.setMenuItem(menu.findItem(R.id.menu_play));
+        gameController.setMenuItem(menu.findItem(R.id.menu_play));
+        //mFirebaseDatabaseHandler.setMenuItem(menu.findItem(R.id.menu_play));
         return true;
     }
 
@@ -124,7 +131,8 @@ public class MainActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(!mFirebaseDatabaseHandler.isReady()) {
+        //if(!mFirebaseDatabaseHandler.isReady()) {
+        if(gameController.isNotReady()) {
             Toast.makeText(
                     this,
                     R.string.toast_database_wait,

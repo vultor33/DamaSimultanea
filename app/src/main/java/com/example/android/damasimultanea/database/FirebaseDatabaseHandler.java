@@ -20,57 +20,26 @@ import java.util.ArrayList;
 public class FirebaseDatabaseHandler {
 
     private int BOARD_SIZE = 64;
-    final private String serverOwner;
-    final private String gameKey = "-LLAb5CMF-eGkalyFFZS";
-    final private String menuPlay;
-    final private String menuWait;
-    private MenuItem menuplayItem;
 
     final private DatabaseReference mPieceEntryReference;
-    final private DatabaseReference mGameHandlerReference;
     private ChildEventListener mChildEventListenerPieces;
-    private ChildEventListener mChildEventListenerGame;
     private ValueEventListener valueEventListener;
 
-    private GameHandler gameHandler;
     private ArrayList<PieceEntry> allPieces = new ArrayList<>();
     private ArrayList<String> allKeys = new ArrayList<>();
 
-    // se play1 e play2 movimentaram as pecas. o Server vai puxar tudo.
-    // executar o movimento dar upload no banco de dados e, por fim,
-    // setar o isPlayable pra true
-
-    public FirebaseDatabaseHandler(Context context, FirebaseDatabase mFirebaseDatabase_in)
+    FirebaseDatabaseHandler(Context context, FirebaseDatabase mFirebaseDatabase_in)
     {
-        serverOwner = context.getString(R.string.firebase_server_owner);
         String boardReference = context.getString(R.string.firebase_board);
-        String gameReference = context.getString(R.string.firebase_game);
-        menuPlay = context.getString(R.string.menu_dama_play);
-        menuWait = context.getString(R.string.menu_dama_wait);
 
         mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference);
-        mGameHandlerReference = mFirebaseDatabase_in.getReference().child(gameReference);
         mChildEventListenerPieces = null;
-        mChildEventListenerGame = null;
         valueEventListener = null;
-        menuplayItem = null;
 
         readAllDatabase();
         //createFireDatabase();// TODO -- BUTTON TO RESET DATABASE
     }
 
-    public boolean isReady(){
-        return isDatabaseLoaded() && isPlayable();
-    }
-
-    public void setMenuItem(MenuItem menuplayItem_in){
-        menuplayItem = menuplayItem_in;
-        setMenuPlayTitle();
-    }
-
-    public void updateGameStatus(GameHandler gameChanges){
-        mGameHandlerReference.child(gameKey).setValue(gameChanges);
-    }
 
     public void updatePiecePosition(int position, PieceEntry pieceEntry){
         mPieceEntryReference
@@ -78,29 +47,12 @@ public class FirebaseDatabaseHandler {
                 .setValue(pieceEntry);
     }
 
-
-    /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
-
-
-    private void savePieceChange(PieceEntry pieceEntry){
-        allPieces.set(pieceEntry.getPosition(), pieceEntry);
-    }
-
-    private boolean isPlayable(){
-        return gameHandler.isPlayable();
-    }
-
     public boolean isDatabaseLoaded(){
         return allPieces.size() == BOARD_SIZE;
     }
 
-    private void setMenuPlayTitle(){
-        if(menuplayItem != null) {
-            if (isReady())
-                menuplayItem.setTitle(menuPlay);
-            else
-                menuplayItem.setTitle(menuWait);
-        }
+    public ArrayList<PieceEntry> getAllPieces(){
+        return allPieces;
     }
 
     public void atachDatabaseReadListener(){
@@ -109,11 +61,6 @@ public class FirebaseDatabaseHandler {
                 mChildEventListenerPieces = new ChildEventListenerPieces();
                 mPieceEntryReference.addChildEventListener(mChildEventListenerPieces);
             }
-            if (mChildEventListenerGame == null) {
-                mChildEventListenerGame = new ChildEventListenerGame();
-                mGameHandlerReference.addChildEventListener(mChildEventListenerGame);
-            }
-
         } else {
             if (valueEventListener == null) {
                 readAllDatabase();
@@ -130,11 +77,30 @@ public class FirebaseDatabaseHandler {
             mPieceEntryReference.removeEventListener(mChildEventListenerPieces);
             mChildEventListenerPieces = null;
         }
-        if(mChildEventListenerGame != null){
-            mGameHandlerReference.removeEventListener(mChildEventListenerGame);
-            mChildEventListenerGame= null;
-        }
     }
+
+    public void readAllDatabase(){
+        if(valueEventListener != null)
+            return;
+
+        allPieces.clear();
+        valueEventListener = new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    allKeys.add(ds.getKey());
+                    PieceEntry piece = ds.getValue(PieceEntry.class);
+                    allPieces.add(piece);
+                }
+                atachDatabaseReadListener();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
+        };
+        mPieceEntryReference.addListenerForSingleValueEvent(valueEventListener);
+    }
+
+    /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
 
     class ChildEventListenerPieces implements ChildEventListener {
         @Override
@@ -161,54 +127,8 @@ public class FirebaseDatabaseHandler {
         }
     }
 
-    class ChildEventListenerGame implements ChildEventListener {
-        @Override
-        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            GameHandler game = dataSnapshot.getValue(GameHandler.class);
-            gameHandler = game;
-            setMenuPlayTitle();
-        }
-
-        @Override
-        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            GameHandler game = dataSnapshot.getValue(GameHandler.class);
-            gameHandler = game;
-            setMenuPlayTitle();
-            Log.d("fredmudar", "data changed:  " + String.valueOf(game.getServer()));
-        }
-
-        @Override
-        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-        }
-
-        @Override
-        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-        }
-    }
-
-    public void readAllDatabase(){
-        if(valueEventListener != null)
-            return;
-
-        allPieces.clear();
-        valueEventListener = new ValueEventListener(){
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    allKeys.add(ds.getKey());
-                    PieceEntry piece = ds.getValue(PieceEntry.class);
-                    allPieces.add(piece);
-                }
-                atachDatabaseReadListener();
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        };
-        mPieceEntryReference.addListenerForSingleValueEvent(valueEventListener);
+    private void savePieceChange(PieceEntry pieceEntry){
+        allPieces.set(pieceEntry.getPosition(), pieceEntry);
     }
 
     private void createFireDatabase(){
@@ -283,9 +203,6 @@ public class FirebaseDatabaseHandler {
         insertEntry(61,true,PieceTypeEnum.pieceB,7,2);
         insertEntry(62,false,PieceTypeEnum.NOTPLAYABLE,-1,-1);
         insertEntry(63,true,PieceTypeEnum.pieceB,7,3);
-
-        GameHandler gameHandler = new GameHandler(serverOwner,-1,-1,-1,-1,true);
-        mGameHandlerReference.push().setValue(gameHandler);
 
     }
 

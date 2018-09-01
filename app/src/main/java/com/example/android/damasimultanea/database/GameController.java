@@ -12,7 +12,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -24,15 +23,10 @@ public class GameController {
     final private String menuWait;
     private MenuItem menuplayItem;
 
-    FirebaseDatabaseHandler mFirebaseDatabaseHandler;
-    private String buttonWait;
+    private FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     final private DatabaseReference mGameHandlerReference;
     private ChildEventListener mChildEventListenerGame;
-    private ValueEventListener valueEventListener;
-
     private GameHandler gameHandler;
-    private ArrayList<PieceEntry> allPieces = new ArrayList<>();
-    private ArrayList<String> allKeys = new ArrayList<>();
 
 
     // TODO ver uma forma de gerenciar os turnos e atualizar no ponto certo.
@@ -48,8 +42,10 @@ public class GameController {
         mGameHandlerReference = mFirebaseDatabase.getReference().child(gameReference);
         mChildEventListenerGame = null;
         menuplayItem = null;
+    }
 
-        mFirebaseDatabaseHandler.readAllDatabase();
+    public void updateGameStatus(GameHandler gameChanges){
+        mGameHandlerReference.child(gameKey).setValue(gameChanges);
     }
 
     public void setMenuItem(MenuItem menuplayItem_in){
@@ -57,40 +53,21 @@ public class GameController {
         setMenuPlayTitle();
     }
 
-    public boolean isReady(){
-        return isPlayable() && mFirebaseDatabaseHandler.isDatabaseLoaded();
+    public boolean isNotReady(){
+        return !(isPlayable() && mFirebaseDatabaseHandler.isDatabaseLoaded());
     }
 
-
-
-
-
-
-    
-
-
-    private boolean isPlayable(){
-        return gameHandler.isPlayable();
+    public ArrayList<PieceEntry> getAllPieces(){
+        return mFirebaseDatabaseHandler.getAllPieces();
     }
-
-    private void setMenuPlayTitle(){
-        if(menuplayItem != null) {
-            if (isReady())
-                menuplayItem.setTitle(menuPlay);
-            else
-                menuplayItem.setTitle(menuWait);
-        }
-    }
-
 
     public void atachDatabaseReadListener(){
+        if (mChildEventListenerGame == null) {
+            mChildEventListenerGame = new GameController.ChildEventListenerGame();
+            mGameHandlerReference.addChildEventListener(mChildEventListenerGame);
+        }
         if(mFirebaseDatabaseHandler.isDatabaseLoaded()){
             mFirebaseDatabaseHandler.atachDatabaseReadListener();
-            if (mChildEventListenerGame == null) {
-                mChildEventListenerGame = new GameController.ChildEventListenerGame();
-                mGameHandlerReference.addChildEventListener(mChildEventListenerGame);
-            }
-
         } else {
             mFirebaseDatabaseHandler.readAllDatabase();
         }
@@ -106,20 +83,42 @@ public class GameController {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    private boolean isPlayable() {
+        return gameHandler != null && gameHandler.isPlayable();
+    }
+
+    private void setMenuPlayTitle(){
+        if(menuplayItem != null) {
+            if (isPlayable())
+                menuplayItem.setTitle(menuPlay);
+            else
+                menuplayItem.setTitle(menuWait);
+        }
+    }
+
     class ChildEventListenerGame implements ChildEventListener {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            GameHandler game = dataSnapshot.getValue(GameHandler.class);
-            gameHandler = game;
+            gameHandler = dataSnapshot.getValue(GameHandler.class);
             setMenuPlayTitle();
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            GameHandler game = dataSnapshot.getValue(GameHandler.class);
-            gameHandler = game;
+            gameHandler = dataSnapshot.getValue(GameHandler.class);
             setMenuPlayTitle();
-            Log.d("fredmudar", "data changed:  " + String.valueOf(game.getServer()));
+            Log.d("fredmudar", "data changed:  " + String.valueOf(gameHandler.getServer()));
         }
 
         @Override
