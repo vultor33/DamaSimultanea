@@ -16,7 +16,7 @@ public class PieceEntry {
     private int row;
     private int column;
 
-    private PieceTypeEnum pieceType; //TODO - colocar o tipo estanho aqui e fazer a conversao depois - playable conversao para blue
+    private PieceTypeEnum pieceType; 
     private boolean isPlayable;
 
 

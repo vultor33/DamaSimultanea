@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// TODO remover android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
+// TODO remover esta linha android colors https://material.io/design/color/the-color-system.html#tools-for-picking-colors
 
 
 

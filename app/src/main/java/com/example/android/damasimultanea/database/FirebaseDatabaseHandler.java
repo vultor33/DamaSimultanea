@@ -48,7 +48,7 @@ public class FirebaseDatabaseHandler {
         menuPlay = context.getString(R.string.menu_dama_play);
         menuWait = context.getString(R.string.menu_dama_wait);
 
-        mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference); //read and write on BOARD flag
+        mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference);
         mGameHandlerReference = mFirebaseDatabase_in.getReference().child(gameReference);
         mChildEventListenerPieces = null;
         mChildEventListenerGame = null;
@@ -78,6 +78,10 @@ public class FirebaseDatabaseHandler {
                 .setValue(pieceEntry);
     }
 
+
+    /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
+
+
     private void savePieceChange(PieceEntry pieceEntry){
         allPieces.set(pieceEntry.getPosition(), pieceEntry);
     }
@@ -86,7 +90,7 @@ public class FirebaseDatabaseHandler {
         return gameHandler.isPlayable();
     }
 
-    private boolean isDatabaseLoaded(){
+    public boolean isDatabaseLoaded(){
         return allPieces.size() == BOARD_SIZE;
     }
 
@@ -130,7 +134,6 @@ public class FirebaseDatabaseHandler {
             mGameHandlerReference.removeEventListener(mChildEventListenerGame);
             mChildEventListenerGame= null;
         }
-
     }
 
     class ChildEventListenerPieces implements ChildEventListener {
@@ -187,7 +190,10 @@ public class FirebaseDatabaseHandler {
         }
     }
 
-    private void readAllDatabase(){
+    public void readAllDatabase(){
+        if(valueEventListener != null)
+            return;
+
         allPieces.clear();
         valueEventListener = new ValueEventListener(){
             @Override
