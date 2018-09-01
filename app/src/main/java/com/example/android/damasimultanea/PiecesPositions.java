@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.example.android.damasimultanea.database.AppDatabase;
 import com.example.android.damasimultanea.database.FirebaseDatabaseHandler;
+import com.example.android.damasimultanea.database.GameController;
 import com.example.android.damasimultanea.database.PieceEntry;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -20,17 +21,23 @@ public class PiecesPositions {
     private AppDatabase pieceDatabase;
     private MovementCalculations movementCalculations;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseDatabaseHandler mFirebaseDatabaseHandler;
-
     PiecesPositions(final Context context){
         pieceDatabase = AppDatabase.getInstance(context);
         movementCalculations = new MovementCalculations(loadAllDatabase());
+    }
+
+    public PiecesPositions(ArrayList<PieceEntry> allPieces){
+        movementCalculations = new MovementCalculations(allPieces);
 
     }
 
+    public void setAllBoard(ArrayList<PieceEntry> allPieces) {
+        movementCalculations.setAllBoard(allPieces);
+    }
 
-    public int getTableSize(){
+
+
+    private int getTableSize(){
         return movementCalculations.getTABLE_SIZE();
     }
 
@@ -45,6 +52,7 @@ public class PiecesPositions {
     public boolean isBothPiecesMovable(){
         return movementCalculations.isBothPiecesMovable();
     }
+
     public PieceTypeEnum avaliateWinningPlayer(){
         return movementCalculations.avaliateWinningPlayer();
     }
@@ -85,7 +93,7 @@ public class PiecesPositions {
 
         Future<Void> future = executorService.submit(new Callable<Void>() {
             public Void call() throws Exception {
-                List<PieceEntry> allBoard = movementCalculations.getAllBoard();
+                ArrayList<PieceEntry> allBoard = movementCalculations.getAllBoard();
                 for(int i = 0; i < getTableSize(); i++){
                     PieceEntry pieceEntry = allBoard.get(i);
                     pieceDatabase.taskDao().updatePiece(pieceEntry);
@@ -101,14 +109,16 @@ public class PiecesPositions {
         executorService.shutdown();
     }
 
-    private List<PieceEntry> loadAllDatabase(){
+    private ArrayList<PieceEntry> loadAllDatabase(){
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<List<PieceEntry>> result = executorService.submit(new Callable<List<PieceEntry>>() {
-            public List<PieceEntry> call() throws Exception {
-                return pieceDatabase.taskDao().loadAllPieces();
+        Future<ArrayList<PieceEntry>> result = executorService.submit(new Callable<ArrayList<PieceEntry>>() {
+            public ArrayList<PieceEntry> call() throws Exception {
+                List<PieceEntry> allPiecesDatabase = pieceDatabase.taskDao().loadAllPieces();
+                ArrayList<PieceEntry> allPiecesReturn = new ArrayList<>(allPiecesDatabase);
+                return allPiecesReturn;
             }
         });
-        List<PieceEntry> allBoard;
+        ArrayList<PieceEntry> allBoard;
         try {
             allBoard = result.get();
         } catch (Exception e) {

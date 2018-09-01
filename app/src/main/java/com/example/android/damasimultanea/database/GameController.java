@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.android.damasimultanea.MovementCalculations;
+import com.example.android.damasimultanea.PieceTypeEnum;
 import com.example.android.damasimultanea.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -44,6 +46,8 @@ public class GameController {
         menuplayItem = null;
     }
 
+    ////////////////////////////   GAME STATUS CONTROLLING /////////////////////////////////////////
+
     public void updateGameStatus(GameHandler gameChanges){
         mGameHandlerReference.child(gameKey).setValue(gameChanges);
     }
@@ -80,19 +84,6 @@ public class GameController {
             mChildEventListenerGame= null;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private boolean isPlayable() {
         return gameHandler != null && gameHandler.isPlayable();
@@ -134,7 +125,53 @@ public class GameController {
         }
     }
 
+    ////////////////////////////   DATABASE CONTROLLING /////////////////////////////////////////
 
 
+    public PieceTypeEnum whichPiece(int position){
+        if(isNotReady())
+            return PieceTypeEnum.NOTPLAYABLE;
+        else
+            return mFirebaseDatabaseHandler.piecesPositions.whichPiece(position);
+    }
+
+    public ArrayList<Integer> possibleMovements(int position) {
+        if(isNotReady())
+            return new ArrayList<>();
+        else
+            return mFirebaseDatabaseHandler.piecesPositions.possibleMovements(position);
+    }
+
+    public boolean isBothPiecesMovable(){
+        if(isNotReady())
+            return false;
+        else
+            return mFirebaseDatabaseHandler.piecesPositions.isBothPiecesMovable();
+    }
+
+    public PieceTypeEnum avaliateWinningPlayer(){
+        if(isNotReady())
+            return PieceTypeEnum.BLANK;
+        else
+            return mFirebaseDatabaseHandler.piecesPositions.avaliateWinningPlayer();
+    }
+
+    // ESSES CARAS INFLUENCIAM O BANCO DE DADOS - trabalhar com eles devagar
+    public void captureAllPossiblePieces(){
+        mFirebaseDatabaseHandler.piecesPositions.captureAllPossiblePieces();
+    }
+    public void movePiece(int piecePosition, int newPiecePosition){
+        if(isNotReady())
+            return;
+        else
+            mFirebaseDatabaseHandler.piecesPositions.movePiece(piecePosition,newPiecePosition);
+    }
+
+    public void deletePiece(int position){
+        if(isNotReady())
+            return;
+        else
+            mFirebaseDatabaseHandler.piecesPositions.deletePiece(position);
+    }
 
 }

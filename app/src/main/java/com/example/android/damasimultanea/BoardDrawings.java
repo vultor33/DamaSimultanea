@@ -7,13 +7,17 @@ import android.view.View;
 import android.widget.TextView;
 
 
+import com.example.android.damasimultanea.database.GameController;
+
 import org.jetbrains.annotations.NotNull;
 
 public class BoardDrawings {
 
     private TurnHandler turnHandler = new TurnHandler();
+    private GameController gameController;
     private PiecesPositions piecesPositions;
-    private MyRecyclerViewAdapter.ViewHolder[] allHolders;
+    private int BOARD_SIZE = 64;
+    private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[BOARD_SIZE];
 
     private TextView winPlayer;
 
@@ -32,9 +36,9 @@ public class BoardDrawings {
 
     //TODO boardrawing esta muito mesclado com turnhandler - construir um game manager que assume essa parte e separa os dois.
 
-    BoardDrawings(@NotNull Context context){
+    BoardDrawings(@NotNull Context context, GameController gameController_in){
+        this.gameController = gameController_in;
         piecesPositions = new PiecesPositions(context);
-        allHolders = new MyRecyclerViewAdapter.ViewHolder[piecesPositions.getTableSize()];//TODO o holder pode ser null e nao tem protecao para isso neste codigo
 
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
@@ -51,7 +55,7 @@ public class BoardDrawings {
     }
 
     public int getTableSize(){
-        return piecesPositions.getTableSize();
+        return BOARD_SIZE;
     }
 
     public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){

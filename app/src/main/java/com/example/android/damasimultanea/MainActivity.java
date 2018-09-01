@@ -58,15 +58,12 @@ public class MainActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTheRecyclerViewer();
-
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        //mFirebaseDatabaseHandler = new FirebaseDatabaseHandler(this, mFirebaseDatabase);
         gameController = new GameController(this,mFirebaseDatabase);
+        setTheRecyclerViewer();
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
-
     }
 
     @Override
@@ -74,9 +71,6 @@ public class MainActivity
         super.onActivityResult(requestCode, resultCode, data);
         if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_CANCELED))
             finish();
-        else if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_OK)){
-            //GameController -- start here TODO
-        }
     }
 
     @Override
@@ -98,7 +92,7 @@ public class MainActivity
     @Override
     public void onItemClick(View view, int position) {
         //if(!mFirebaseDatabaseHandler.isReady()) {
-        if(!gameController.isNotReady()) {
+        if(gameController.isNotReady()) {
             Toast.makeText(
                     this,
                     R.string.toast_database_wait,
@@ -166,7 +160,7 @@ public class MainActivity
         mRecyclerViewer = (RecyclerView) findViewById(R.id.rvNumbers);
         int numberOfColumns = 8;
         mRecyclerViewer.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
-        adapter = new MyRecyclerViewAdapter(context);
+        adapter = new MyRecyclerViewAdapter(context, gameController);
         adapter.setClickListener(this);
         mRecyclerViewer.setAdapter(adapter);
     }

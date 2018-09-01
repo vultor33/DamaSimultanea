@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MovementCalculations {
     private int INVALID_NUMBER = -1;
-    private List<PieceEntry> allBoard;
+    private ArrayList<PieceEntry> allBoard;
 
     private int ROW_SIZE;
     private int COLUMN_SIZE;
@@ -30,18 +30,18 @@ public class MovementCalculations {
         PieceTypeEnum piece = PieceTypeEnum.NOTPLAYABLE;
     }
 
-    MovementCalculations(List<PieceEntry> allBoard_in){
+    MovementCalculations(ArrayList<PieceEntry> allBoard_in){
         allBoard = allBoard_in;
         ROW_SIZE = 8;
         COLUMN_SIZE = 4;
         TABLE_SIZE = (ROW_SIZE * COLUMN_SIZE * 2);
     }
 
-    public List<PieceEntry> getAllBoard(){
+    public ArrayList<PieceEntry> getAllBoard(){
         return allBoard;
     }
 
-    public void setAllBoard(List<PieceEntry> allBoard_in){
+    public void setAllBoard(ArrayList<PieceEntry> allBoard_in){
         allBoard = allBoard_in;
     }
 

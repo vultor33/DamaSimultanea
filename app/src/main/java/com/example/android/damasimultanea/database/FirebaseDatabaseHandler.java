@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.android.damasimultanea.PieceTypeEnum;
+import com.example.android.damasimultanea.PiecesPositions;
 import com.example.android.damasimultanea.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 public class FirebaseDatabaseHandler {
 
     private int BOARD_SIZE = 64;
+
+    public PiecesPositions piecesPositions;
 
     final private DatabaseReference mPieceEntryReference;
     private ChildEventListener mChildEventListenerPieces;
@@ -35,6 +38,7 @@ public class FirebaseDatabaseHandler {
         mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference);
         mChildEventListenerPieces = null;
         valueEventListener = null;
+        piecesPositions = null;
 
         readAllDatabase();
         //createFireDatabase();// TODO -- BUTTON TO RESET DATABASE
@@ -92,7 +96,12 @@ public class FirebaseDatabaseHandler {
                     PieceEntry piece = ds.getValue(PieceEntry.class);
                     allPieces.add(piece);
                 }
+                Log.d("fredmudar","terminou");
                 atachDatabaseReadListener();
+                if(piecesPositions == null)
+                    piecesPositions = new PiecesPositions(allPieces);
+                else
+                    piecesPositions.setAllBoard(allPieces);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {}

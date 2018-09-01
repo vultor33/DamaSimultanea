@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.damasimultanea.database.GameController;
 import com.example.android.damasimultanea.database.PieceEntry;
 
 import java.util.Arrays;
@@ -24,9 +25,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    MyRecyclerViewAdapter(Context context) {
+    MyRecyclerViewAdapter(Context context, GameController gameController) {
         this.mInflater = LayoutInflater.from(context);
-        boardDrawings = new BoardDrawings(context);
+        boardDrawings = new BoardDrawings(context, gameController);
     }
 
     @NonNull
