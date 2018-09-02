@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class BoardDrawings {
 
-    private TurnHandler turnHandler = new TurnHandler();
+    public TurnHandler turnHandler = new TurnHandler();
     private PiecesPositions piecesPositions;
     private int BOARD_SIZE = 64;
     private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[BOARD_SIZE];
@@ -64,11 +64,13 @@ public class BoardDrawings {
         allHolders[position] = holder;
     }
 
-    public void playPiece(int position){
-        if(turnHandler.isPositionAPossibleMovement(position))
+    public void playPiece(int position, PieceTypeEnum playerPiece) {
+        if (turnHandler.isPositionAPossibleMovement(position))
             setPieceMovement(position);
-        else
-            highlightMovements(position);
+        else {
+            if(playerPiece.equals(piecesPositions.whichPiece(position)))
+                highlightMovements(position);
+        }
     }
 
     public void resolveAllMovements(){
@@ -122,17 +124,6 @@ public class BoardDrawings {
     public void drawAllBackground(){
         for(int i = 0; i < getTableSize(); i++)
             drawBackground(i);
-    }
-
-    //TODO implementar isso aqui
-    public void resetDatabase(){
-        piecesPositions.safeResetDatabase();
-        winPlayer.setText("");
-        drawAllBackground();
-        drawAllPieces();
-    }
-    public void saveDatabase(){
-        piecesPositions.saveDatabase();
     }
 
     public void drawPiece(int position){

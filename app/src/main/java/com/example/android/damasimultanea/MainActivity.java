@@ -48,11 +48,8 @@ public class MainActivity
     FirebaseDatabase mFirebaseDatabase;
     FirebaseAuth mFirebaseAuth;
 
-    //FirebaseDatabaseHandler mFirebaseDatabaseHandler;
     GameController gameController;
     AuthenticationHandler mAuthentication;
-
-    MenuItem playButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +61,13 @@ public class MainActivity
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthentication = new AuthenticationHandler(this, mFirebaseAuth);
+        gameController.setPlayerName(mAuthentication.getUserName());
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("fredmudar", "result activity");
         if((requestCode == mAuthentication.getAuthenticationRequestedCode()) && (resultCode == RESULT_CANCELED))
             finish();
     }
@@ -78,7 +77,6 @@ public class MainActivity
         super.onPause();
         mAuthentication.removeListener();
         gameController.detachDatabaseReadListener();
-        //mFirebaseDatabaseHandler.detachDatabaseReadListener();
     }
 
     @Override
@@ -86,12 +84,10 @@ public class MainActivity
         super.onResume();
         mAuthentication.addListener();
         gameController.atachDatabaseReadListener();
-        //mFirebaseDatabaseHandler.atachDatabaseReadListener();
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        //if(!mFirebaseDatabaseHandler.isReady()) {
         if(gameController.isNotReady()) {
             Toast.makeText(
                     this,
@@ -108,7 +104,6 @@ public class MainActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.dama_menu, menu);
         gameController.setMenuItem(menu.findItem(R.id.menu_play));
-        //mFirebaseDatabaseHandler.setMenuItem(menu.findItem(R.id.menu_play));
         return true;
     }
 
@@ -120,12 +115,10 @@ public class MainActivity
     @Override
     protected void onStop() {
         super.onStop();
-        //adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //if(!mFirebaseDatabaseHandler.isReady()) {
         if(gameController.isNotReady()) {
             Toast.makeText(
                     this,
@@ -134,6 +127,7 @@ public class MainActivity
                     .show();
             return super.onOptionsItemSelected(item);
         }
+        gameController.setPlayerName(mAuthentication.getUserName());//Todo arr maria, esser trem feio aqui
 
         int id = item.getItemId();
         if (id == R.id.menu_play) {

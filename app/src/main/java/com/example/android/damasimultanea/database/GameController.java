@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.android.damasimultanea.AuthenticationHandler;
 import com.example.android.damasimultanea.MovementCalculations;
 import com.example.android.damasimultanea.MyRecyclerViewAdapter;
 import com.example.android.damasimultanea.PieceTypeEnum;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 
 public class GameController {
 
+    private String playerName = "";
+    private boolean alreadyPlayed = false;
     final private String serverOwner;
     final private String gameKey = "-LLAb5CMF-eGkalyFFZS";
     final private String menuPlay;
@@ -49,8 +52,8 @@ public class GameController {
 
     ////////////////////////////   GAME STATUS CONTROLLING /////////////////////////////////////////
 
-    public void updateGameStatus(GameHandler gameChanges){
-        mGameHandlerReference.child(gameKey).setValue(gameChanges);
+    public void setPlayerName(String playerName_in){
+        this.playerName = playerName_in;
     }
 
     public void setMenuItem(MenuItem menuplayItem_in){
@@ -83,7 +86,7 @@ public class GameController {
     }
 
     private boolean isPlayable() {
-        return gameHandler != null && gameHandler.isPlayable();
+        return gameHandler != null && !alreadyPlayed;
     }
 
     private void setMenuPlayTitle(){
@@ -99,14 +102,15 @@ public class GameController {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             gameHandler = dataSnapshot.getValue(GameHandler.class);
+            evaluatePlayableConditions();
             setMenuPlayTitle();
         }
 
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             gameHandler = dataSnapshot.getValue(GameHandler.class);
+            evaluatePlayableConditions();
             setMenuPlayTitle();
-            Log.d("fredmudar", "data changed:  " + String.valueOf(gameHandler.getServer()));
         }
 
         @Override
@@ -122,6 +126,39 @@ public class GameController {
         }
     }
 
+    private void updateGameStatusPosition(PieceTypeEnum playerPiece, int position, int destination){
+        if(playerPiece.equals(PieceTypeEnum.pieceA)) {
+            mGameHandlerReference.child(gameKey).child("player1MovedPiecePosition").setValue(position);
+            mGameHandlerReference.child(gameKey).child("player1MovedPieceDestination").setValue(destination);
+        } else {
+            mGameHandlerReference.child(gameKey).child("player2MovedPiecePosition").setValue(position);
+            mGameHandlerReference.child(gameKey).child("player2MovedPieceDestination").setValue(destination);
+        }
+        alreadyPlayed = true;
+    }
+
+    private void evaluatePlayableConditions(){// TODO mexer nisso aqui
+        boolean play1 = false;
+        boolean play2 = false;
+        if(playerName.equals(serverOwner)){
+            if(gameHandler.getPlayer1MovedPieceDestination() != -1)
+                alreadyPlayed = true;
+        } else {
+            if(gameHandler.getPlayer2MovedPiecePosition() != -1)
+                alreadyPlayed = true;
+        }
+        if(gameHandler.getPlayer1MovedPieceDestination() != -1)
+            play1 = true;
+        if(gameHandler.getPlayer2MovedPieceDestination() != -1)
+            play2 = true;
+        if(play1 && play2){
+            if(playerName.equals(serverOwner))
+                mFirebaseDatabaseHandler.resolveAllMovements();
+            mFirebaseDatabaseHandler.boardDrawings.drawAllBackground();
+            mFirebaseDatabaseHandler.boardDrawings.turnHandler.clearAllPlayersData();
+        }
+        alreadyPlayed = false;
+    }
 
     /////////////////////////////     BOARD DRAWING    ///////////////////////////////////////////////////
 
@@ -136,11 +173,24 @@ public class GameController {
     public void playPiece(int position){
         if(isNotReady())
             return;
-        mFirebaseDatabaseHandler.playPiece(position);
+        if(playerName.equals(serverOwner))
+            mFirebaseDatabaseHandler.playPiece(position, PieceTypeEnum.pieceA);
+        else
+            mFirebaseDatabaseHandler.playPiece(position, PieceTypeEnum.pieceB);
     }
 
-    public void resolveAllMovements(){
-        mFirebaseDatabaseHandler.resolveAllMovements();
+    public void sendMove(){//refactor isso aqui para sendo move e depois colocar um privtt
+        if(!mFirebaseDatabaseHandler.boardDrawings.turnHandler.isTurnEnded())
+            return;
+        if(playerName.equals(serverOwner)){
+            int positionA = mFirebaseDatabaseHandler.boardDrawings.turnHandler.getPlayer1Position();
+            int destinationA = mFirebaseDatabaseHandler.boardDrawings.turnHandler.getPlayer1Destination();
+            updateGameStatusPosition(PieceTypeEnum.pieceA,positionA,destinationA);
+        } else {
+            int positionB = mFirebaseDatabaseHandler.boardDrawings.turnHandler.getPlayer2Position();
+            int destinationB = mFirebaseDatabaseHandler.boardDrawings.turnHandler.getPlayer2Destination();
+            updateGameStatusPosition(PieceTypeEnum.pieceA,positionB,destinationB);
+        }
     }
 
     public void gameEndConditions(){
@@ -156,57 +206,5 @@ public class GameController {
     }
 
 
-
-
-    ////////////////////////////   DATABASE CONTROLLING /////////////////////////////////////////
-/*
-
-    public PieceTypeEnum whichPiece(int position){
-        if(isNotReady())
-            return PieceTypeEnum.NOTPLAYABLE;
-        else
-            return mFirebaseDatabaseHandler.piecesPositions.whichPiece(position);
-    }
-
-    public ArrayList<Integer> possibleMovements(int position) {
-        if(isNotReady())
-            return new ArrayList<>();
-        else
-            return mFirebaseDatabaseHandler.piecesPositions.possibleMovements(position);
-    }
-
-    public boolean isBothPiecesMovable(){
-        if(isNotReady())
-            return false;
-        else
-            return mFirebaseDatabaseHandler.piecesPositions.isBothPiecesMovable();
-    }
-
-    public PieceTypeEnum avaliateWinningPlayer(){
-        if(isNotReady())
-            return PieceTypeEnum.BLANK;
-        else
-            return mFirebaseDatabaseHandler.piecesPositions.avaliateWinningPlayer();
-    }
-
-    // ESSES CARAS INFLUENCIAM O BANCO DE DADOS - trabalhar com eles devagar
-    public void captureAllPossiblePieces(){
-        mFirebaseDatabaseHandler.piecesPositions.captureAllPossiblePieces();
-    }
-    public void movePiece(int piecePosition, int newPiecePosition){
-        if(isNotReady())
-            return;
-        else
-            mFirebaseDatabaseHandler.piecesPositions.movePiece(piecePosition,newPiecePosition);
-    }
-
-    public void deletePiece(int position){
-        if(isNotReady())
-            return;
-        else
-            mFirebaseDatabaseHandler.piecesPositions.deletePiece(position);
-    }
-
-*/
 
 }

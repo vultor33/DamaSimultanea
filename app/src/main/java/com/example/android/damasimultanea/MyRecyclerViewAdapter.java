@@ -1,12 +1,8 @@
 package com.example.android.damasimultanea;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.damasimultanea.database.GameController;
-import com.example.android.damasimultanea.database.PieceEntry;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
@@ -91,7 +83,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         gameController.playPiece(position);
     }
     public void endTurn(){
-        gameController.resolveAllMovements();
+        gameController.sendMove();
         gameController.gameEndConditions();
 
     }

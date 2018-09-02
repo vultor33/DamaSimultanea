@@ -89,7 +89,6 @@ public class FirebaseDatabaseHandler {
                     PieceEntry piece = ds.getValue(PieceEntry.class);
                     allPieces.add(piece);
                 }
-                Log.d("fredmudar","terminou");
                 piecesPositions = new PiecesPositions(allPieces);
                 boardDrawings.setPiecesPositions(piecesPositions);
                 drawAllBoard();
@@ -110,8 +109,8 @@ public class FirebaseDatabaseHandler {
         boardDrawings.addHolder(holder,position);
     }
 
-    public void playPiece(int position){
-        boardDrawings.playPiece(position);
+    public void playPiece(int position, PieceTypeEnum playerPiece){
+        boardDrawings.playPiece(position, playerPiece);
     }
 
     public void resolveAllMovements(){
@@ -132,6 +131,19 @@ public class FirebaseDatabaseHandler {
         updateAllPieces(defaultFireDatabase());
     }
 
+    public int getPlayerAPosition(){
+        return boardDrawings.turnHandler.getPlayer1Position();
+    }
+    public int getPlayerADestination(){
+        return boardDrawings.turnHandler.getPlayer1Destination();
+    }
+    public int getPlayerBPosition(){
+        return boardDrawings.turnHandler.getPlayer2Position();
+    }
+    public int getPlayerBdestination(){
+        return boardDrawings.turnHandler.getPlayer2Destination();
+    }
+
     /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
 
     class ChildEventListenerPieces implements ChildEventListener {
@@ -142,7 +154,6 @@ public class FirebaseDatabaseHandler {
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             PieceEntry piece = dataSnapshot.getValue(PieceEntry.class);
-            Log.d("fredmudar", "data changed:  " + String.valueOf(piece.getPosition()));
             savePieceChange(piece);
         }
 

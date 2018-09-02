@@ -29,7 +29,7 @@ public class TurnHandler {
     }
 
     public boolean isTurnEnded(){
-        return ((player1.position != NOT_SELECTED) && (player2.position != NOT_SELECTED));
+        return ((player1.position != NOT_SELECTED) || (player2.position != NOT_SELECTED));
     }
 
     public void clearAllPlayersData(){

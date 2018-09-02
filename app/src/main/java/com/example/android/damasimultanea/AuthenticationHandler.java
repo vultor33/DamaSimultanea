@@ -20,7 +20,7 @@ public class AuthenticationHandler {
     private final int RC_SIGN_IN = 1;
     private final String ANONYMUS = "anonymus";
     final private Context context;
-    private String mUsername;
+    private String mUsername = ANONYMUS;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
