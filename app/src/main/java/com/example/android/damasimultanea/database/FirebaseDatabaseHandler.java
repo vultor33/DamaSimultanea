@@ -5,7 +5,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.example.android.damasimultanea.BoardDrawings;
+import com.example.android.damasimultanea.MyRecyclerViewAdapter;
 import com.example.android.damasimultanea.PieceTypeEnum;
 import com.example.android.damasimultanea.PiecesPositions;
 import com.example.android.damasimultanea.R;
@@ -21,19 +24,20 @@ import java.util.ArrayList;
 public class FirebaseDatabaseHandler {
 
     private int BOARD_SIZE = 64;
+    BoardDrawings boardDrawings;
 
-    public PiecesPositions piecesPositions;
+    private PiecesPositions piecesPositions;
 
     final private DatabaseReference mPieceEntryReference;
     private ChildEventListener mChildEventListenerPieces;
     private ValueEventListener valueEventListener;
 
-    private ArrayList<PieceEntry> allPieces = new ArrayList<>();
     private ArrayList<String> allKeys = new ArrayList<>();
 
     FirebaseDatabaseHandler(Context context, FirebaseDatabase mFirebaseDatabase_in)
     {
         String boardReference = context.getString(R.string.firebase_board);
+        boardDrawings = new BoardDrawings(context);
 
         mPieceEntryReference = mFirebaseDatabase_in.getReference().child(boardReference);
         mChildEventListenerPieces = null;
@@ -44,19 +48,8 @@ public class FirebaseDatabaseHandler {
         //createFireDatabase();// TODO -- BUTTON TO RESET DATABASE
     }
 
-
-    public void updatePiecePosition(int position, PieceEntry pieceEntry){
-        mPieceEntryReference
-                .child(allKeys.get(position))
-                .setValue(pieceEntry);
-    }
-
     public boolean isDatabaseLoaded(){
-        return allPieces.size() == BOARD_SIZE;
-    }
-
-    public ArrayList<PieceEntry> getAllPieces(){
-        return allPieces;
+        return piecesPositions != null;
     }
 
     public void atachDatabaseReadListener(){
@@ -87,29 +80,64 @@ public class FirebaseDatabaseHandler {
         if(valueEventListener != null)
             return;
 
-        allPieces.clear();
         valueEventListener = new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<PieceEntry> allPieces = new ArrayList<>();
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
                     allKeys.add(ds.getKey());
                     PieceEntry piece = ds.getValue(PieceEntry.class);
                     allPieces.add(piece);
                 }
                 Log.d("fredmudar","terminou");
+                piecesPositions = new PiecesPositions(allPieces);
+                boardDrawings.setPiecesPositions(piecesPositions);
+                drawAllBoard();
                 atachDatabaseReadListener();
-                if(piecesPositions == null)
-                    piecesPositions = new PiecesPositions(allPieces);
-                else
-                    piecesPositions.setAllBoard(allPieces);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {}
         };
         mPieceEntryReference.addListenerForSingleValueEvent(valueEventListener);
     }
+    /////////////////////////////     BOARD DRAWING    ///////////////////////////////////////////////////
+
+    public int getTableSize(){
+        return BOARD_SIZE;
+    }
+
+    public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){
+        boardDrawings.addHolder(holder,position);
+    }
+
+    public void playPiece(int position){
+        boardDrawings.playPiece(position);
+    }
+
+    public void resolveAllMovements(){
+        boardDrawings.resolveAllMovements();
+        ArrayList<PieceEntry> allPieces = piecesPositions.getAllPieces();
+        for(PieceEntry piece : allPieces){
+            updatePiecePosition(piece.getPosition(),piece);
+        }
+    }
+
+    public void gameEndConditions(){
+        boardDrawings.gameEndConditions();
+    }
+
+    public void drawAllBoard(){
+        boardDrawings.drawAllPieces();
+        boardDrawings.drawAllBackground();
+    }
 
     /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
+
+    private void updatePiecePosition(int position, PieceEntry pieceEntry){
+        mPieceEntryReference
+                .child(allKeys.get(position))
+                .setValue(pieceEntry);
+    }
 
     class ChildEventListenerPieces implements ChildEventListener {
         @Override
@@ -119,8 +147,8 @@ public class FirebaseDatabaseHandler {
         @Override
         public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             PieceEntry piece = dataSnapshot.getValue(PieceEntry.class);
-            savePieceChange(piece);
             Log.d("fredmudar", "data changed:  " + String.valueOf(piece.getPosition()));
+            savePieceChange(piece);
         }
 
         @Override
@@ -137,7 +165,8 @@ public class FirebaseDatabaseHandler {
     }
 
     private void savePieceChange(PieceEntry pieceEntry){
-        allPieces.set(pieceEntry.getPosition(), pieceEntry);
+        piecesPositions.setPostionI(pieceEntry.getPosition(),pieceEntry);
+        boardDrawings.drawAllPieces();//Todo colocar na posicao
     }
 
     private void createFireDatabase(){

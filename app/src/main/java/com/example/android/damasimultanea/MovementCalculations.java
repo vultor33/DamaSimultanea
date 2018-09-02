@@ -265,6 +265,10 @@ public class MovementCalculations {
         allBoard.get(position).setPieceType(PieceTypeEnum.BLANK);
     }
 
+    public void setPieceI(int positionI, PieceEntry pieceEntry){
+        allBoard.set(positionI,pieceEntry);
+    }
+
     private void createPieceAtPosition(int position, PieceTypeEnum piece){
         allBoard.get(position).setPieceType(piece);
     }

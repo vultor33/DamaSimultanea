@@ -21,13 +21,13 @@ import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    private BoardDrawings boardDrawings;
+    private GameController gameController;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    MyRecyclerViewAdapter(Context context, GameController gameController) {
+    MyRecyclerViewAdapter(Context context, GameController gameController_in) {
         this.mInflater = LayoutInflater.from(context);
-        boardDrawings = new BoardDrawings(context, gameController);
+        this.gameController = gameController_in;
     }
 
     @NonNull
@@ -39,12 +39,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        boardDrawings.addHolder(holder,position);
+        gameController.addHolder(holder,position);
     }
 
     @Override
     public int getItemCount() {
-        return boardDrawings.getTableSize(); //cell count
+        return gameController.getTableSize(); //cell count
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -88,19 +88,20 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     //GAME OPTIONS
     public void playPiece(int position){
-        boardDrawings.playPiece(position);
+        gameController.playPiece(position);
     }
     public void endTurn(){
-        boardDrawings.resolveAllMovements();
-        boardDrawings.gameEndConditions();
+        gameController.resolveAllMovements();
+        gameController.gameEndConditions();
 
     }
+
     public void saveDatabase(){
-        boardDrawings.saveDatabase();
+        Log.d("fredmudar","deactivated");
     }
 
     public void resetDatabase(){
-        boardDrawings.resetDatabase();
+        Log.d("fredmudar","deactivated");
     }
 
 

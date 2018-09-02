@@ -9,6 +9,7 @@ import com.example.android.damasimultanea.database.GameController;
 import com.example.android.damasimultanea.database.PieceEntry;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,6 +34,14 @@ public class PiecesPositions {
 
     public void setAllBoard(ArrayList<PieceEntry> allPieces) {
         movementCalculations.setAllBoard(allPieces);
+    }
+
+    public void setPostionI(int postionI, PieceEntry pieceEntry){
+        movementCalculations.setPieceI(postionI,pieceEntry);
+    }
+
+    public ArrayList<PieceEntry> getAllPieces(){
+        return movementCalculations.getAllBoard();
     }
 
 

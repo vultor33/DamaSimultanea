@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.android.damasimultanea.MovementCalculations;
+import com.example.android.damasimultanea.MyRecyclerViewAdapter;
 import com.example.android.damasimultanea.PieceTypeEnum;
 import com.example.android.damasimultanea.R;
 import com.google.firebase.database.ChildEventListener;
@@ -59,10 +60,6 @@ public class GameController {
 
     public boolean isNotReady(){
         return !(isPlayable() && mFirebaseDatabaseHandler.isDatabaseLoaded());
-    }
-
-    public ArrayList<PieceEntry> getAllPieces(){
-        return mFirebaseDatabaseHandler.getAllPieces();
     }
 
     public void atachDatabaseReadListener(){
@@ -125,8 +122,40 @@ public class GameController {
         }
     }
 
-    ////////////////////////////   DATABASE CONTROLLING /////////////////////////////////////////
 
+    /////////////////////////////     BOARD DRAWING    ///////////////////////////////////////////////////
+
+    public int getTableSize(){
+        return mFirebaseDatabaseHandler.getTableSize();
+    }
+
+    public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){
+        mFirebaseDatabaseHandler.addHolder(holder,position);
+    }
+
+    public void playPiece(int position){
+        if(isNotReady())
+            return;
+        mFirebaseDatabaseHandler.playPiece(position);
+    }
+
+    public void resolveAllMovements(){
+        mFirebaseDatabaseHandler.resolveAllMovements();
+    }
+
+    public void gameEndConditions(){
+        mFirebaseDatabaseHandler.gameEndConditions();
+    }
+
+    public void drawAllBoard(){
+        mFirebaseDatabaseHandler.drawAllBoard();
+    }
+
+
+
+
+    ////////////////////////////   DATABASE CONTROLLING /////////////////////////////////////////
+/*
 
     public PieceTypeEnum whichPiece(int position){
         if(isNotReady())
@@ -173,5 +202,7 @@ public class GameController {
         else
             mFirebaseDatabaseHandler.piecesPositions.deletePiece(position);
     }
+
+*/
 
 }

@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 public class BoardDrawings {
 
     private TurnHandler turnHandler = new TurnHandler();
-    private GameController gameController;
     private PiecesPositions piecesPositions;
     private int BOARD_SIZE = 64;
     private MyRecyclerViewAdapter.ViewHolder[] allHolders = new MyRecyclerViewAdapter.ViewHolder[BOARD_SIZE];
@@ -36,9 +35,8 @@ public class BoardDrawings {
 
     //TODO boardrawing esta muito mesclado com turnhandler - construir um game manager que assume essa parte e separa os dois.
 
-    BoardDrawings(@NotNull Context context, GameController gameController_in){
-        this.gameController = gameController_in;
-        piecesPositions = new PiecesPositions(context);
+    public BoardDrawings(@NotNull Context context){
+        piecesPositions = null;
 
         pieceSideAColor = ContextCompat.getColor(context, R.color.pieceA);
         pieceSideBColor = ContextCompat.getColor(context, R.color.pieceB);
@@ -54,14 +52,16 @@ public class BoardDrawings {
         winError = context.getString(R.string.win_error);
     }
 
+    public void setPiecesPositions(PiecesPositions piecesPositions_in){
+        this.piecesPositions = piecesPositions_in;
+    }
+
     public int getTableSize(){
         return BOARD_SIZE;
     }
 
     public void addHolder(MyRecyclerViewAdapter.ViewHolder holder, int position){
         allHolders[position] = holder;
-        drawBackground(position);
-        drawPiece(position);
     }
 
     public void playPiece(int position){
@@ -114,6 +114,17 @@ public class BoardDrawings {
         winPlayer.setVisibility(View.VISIBLE);
     }
 
+    public void drawAllPieces(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawPiece(i);
+    }
+
+    public void drawAllBackground(){
+        for(int i = 0; i < getTableSize(); i++)
+            drawBackground(i);
+    }
+
+    //TODO implementar isso aqui
     public void resetDatabase(){
         piecesPositions.safeResetDatabase();
         winPlayer.setText("");
@@ -124,6 +135,8 @@ public class BoardDrawings {
         piecesPositions.saveDatabase();
     }
 
+
+    /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
 
 
     private void setPieceMovement(int toPosition){
@@ -162,28 +175,12 @@ public class BoardDrawings {
         turnHandler.clearPossibleMovements();
     }
 
-
-
-
-
-
-
     private void drawBackground(int position){
         if (piecesPositions.whichPiece(position) != PieceTypeEnum.NOTPLAYABLE) {
             allHolders[position].myTextView.setBackgroundColor(backGroundPlayableColor);
         } else {
             allHolders[position].myTextView.setBackgroundColor(backGroundNotPlayableColor);
         }
-    }
-
-    private void drawAllPieces(){
-        for(int i = 0; i < getTableSize(); i++)
-            drawPiece(i);
-    }
-
-    private void drawAllBackground(){
-        for(int i = 0; i < getTableSize(); i++)
-            drawBackground(i);
     }
 
     private void drawPiece(int position){
