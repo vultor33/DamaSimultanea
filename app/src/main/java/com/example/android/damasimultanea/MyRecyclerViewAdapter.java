@@ -96,12 +96,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     }
 
-    public void saveDatabase(){
-        Log.d("fredmudar","deactivated");
-    }
-
     public void resetDatabase(){
-        Log.d("fredmudar","deactivated");
+        gameController.resetDatabase();
     }
 
 

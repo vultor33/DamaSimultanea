@@ -135,6 +135,27 @@ public class BoardDrawings {
         piecesPositions.saveDatabase();
     }
 
+    public void drawPiece(int position){
+        switch (piecesPositions.whichPiece(position)){
+            case BLANK:
+                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
+                break;
+
+            case pieceA:
+                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
+                allHolders[position].pieceImage.setColorFilter(pieceSideAColor);
+                break;
+
+            case pieceB:
+                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
+                allHolders[position].pieceImage.setColorFilter(pieceSideBColor);
+                break;
+
+            default:
+                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
+        }
+    }
+
 
     /////////////////////////////     PRIVATE    ///////////////////////////////////////////////////
 
@@ -180,27 +201,6 @@ public class BoardDrawings {
             allHolders[position].myTextView.setBackgroundColor(backGroundPlayableColor);
         } else {
             allHolders[position].myTextView.setBackgroundColor(backGroundNotPlayableColor);
-        }
-    }
-
-    private void drawPiece(int position){
-        switch (piecesPositions.whichPiece(position)){
-            case BLANK:
-                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
-                break;
-
-            case pieceA:
-                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
-                allHolders[position].pieceImage.setColorFilter(pieceSideAColor);
-                break;
-
-            case pieceB:
-                allHolders[position].pieceImage.setVisibility(View.VISIBLE);
-                allHolders[position].pieceImage.setColorFilter(pieceSideBColor);
-                break;
-
-            default:
-                allHolders[position].pieceImage.setVisibility(View.INVISIBLE);
         }
     }
 }

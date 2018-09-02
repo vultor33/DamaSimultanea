@@ -120,7 +120,7 @@ public class MainActivity
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
+        //adapter.saveDatabase();//TODO as acoes nao estao funcionando quando a tela gira
     }
 
     @Override

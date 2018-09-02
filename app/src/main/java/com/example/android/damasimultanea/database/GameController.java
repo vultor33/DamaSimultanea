@@ -151,6 +151,10 @@ public class GameController {
         mFirebaseDatabaseHandler.drawAllBoard();
     }
 
+    public void resetDatabase(){
+        mFirebaseDatabaseHandler.resetDatabase();
+    }
+
 
 
 
